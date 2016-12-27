@@ -161,4 +161,8 @@ public class Game {
         // TODO add logic
         return false;
     }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
 }
