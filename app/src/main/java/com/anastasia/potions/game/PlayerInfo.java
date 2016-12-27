@@ -36,4 +36,8 @@ public class PlayerInfo {
     public int getScore() {
         return score;
     }
+
+    public String getName() {
+        return player.name;
+    }
 }
