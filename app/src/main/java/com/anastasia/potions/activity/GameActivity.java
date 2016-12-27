@@ -7,15 +7,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.anastasia.potions.R;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
+import com.anastasia.potions.adapter.HandCardAdapter;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.Game;
 import com.anastasia.potions.game.PlayerInfo;
-import com.anastasia.potions.adapter.HandCardAdapter;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -44,6 +45,7 @@ public class GameActivity extends Activity {
     }
 
     void startTurn() {
+        updatePlayerName();
         fillPlayerHand();
     }
 
@@ -76,6 +78,12 @@ public class GameActivity extends Activity {
         } else {
             getSecondScoreButton().setText(Integer.toString(updatedScore));
         }
+    }
+
+    void updatePlayerName() {
+        TextView playerNameView = (TextView) findViewById(R.id.current_player_name_view);
+
+        playerNameView.setText(game.getCurrentPlayer().getName());
     }
 
     void fillPlayerHand() {
@@ -148,6 +156,12 @@ public class GameActivity extends Activity {
         });
     }
 
+    public void nextTurn(View v) {
+        endTurn();
+        game.nextTurn();
+        startTurn();
+    }
+
     void endTurn() {
         // здесь проверять?
         if (game.ended()) {
@@ -171,7 +185,5 @@ public class GameActivity extends Activity {
 
             endDialog.show();
         }
-
-        game.nextTurn();
     }
 }
