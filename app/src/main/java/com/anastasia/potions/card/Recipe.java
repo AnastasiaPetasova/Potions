@@ -7,11 +7,17 @@ import java.util.List;
 public enum Recipe implements Iterable<Recipe> {
 
     WATER(), FIRE(),
-    ICE(WATER, WATER), SUN(FIRE, FIRE), TOOTH();
+    ICE(2, WATER, WATER), SUN(2, FIRE, FIRE), TOOTH();
 
-    List<Recipe> mixedRecipes;
+    public final int score;
+    public final List<Recipe> mixedRecipes;
 
-    Recipe(Recipe... recipes) {
+    Recipe() {
+        this(1);
+    }
+
+    Recipe(int score, Recipe... recipes) {
+        this.score = score;
         this.mixedRecipes = Arrays.asList(recipes);
     }
 
