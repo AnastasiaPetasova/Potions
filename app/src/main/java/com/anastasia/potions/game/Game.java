@@ -16,8 +16,8 @@ public class Game {
 
     final static Random rnd = new Random();
 
-    final static int DIFFERENT_CARDS_COUNT = 6, EACH_CARD_COUNT = 2;
-    final static int PLAYER_HAND_SIZE = 5;
+    final static int DIFFERENT_CARDS_COUNT = 6, EACH_CARD_COUNT = 5;
+    final static int PLAYER_HAND_SIZE = 7;
 
     public Deque<Card> deck;
     public List<CupboardCell> cupboard;
