@@ -32,4 +32,8 @@ public class PlayerInfo {
     public List<Card> getCards() {
         return cards;
     }
+
+    public int getScore() {
+        return score;
+    }
 }
