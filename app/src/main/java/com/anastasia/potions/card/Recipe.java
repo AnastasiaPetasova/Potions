@@ -6,8 +6,8 @@ import java.util.List;
 
 public enum Recipe implements Iterable<Recipe> {
 
-    WATER(), ICE(), FIRE(), SUN(),
-    HATE(FIRE, ICE), STEAM(WATER, SUN);
+    WATER(), FIRE(),
+    ICE(WATER, WATER), SUN(FIRE, FIRE), TOOTH();
 
     List<Recipe> mixedRecipes;
 

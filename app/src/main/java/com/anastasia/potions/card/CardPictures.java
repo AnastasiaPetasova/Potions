@@ -26,11 +26,10 @@ public class CardPictures {
     }
 
     private static void initRecipes() {
-        addPicture(Recipe.WATER, R.drawable.achivments);
-        addPicture(Recipe.ICE, R.drawable.achivments);
-        addPicture(Recipe.FIRE, R.drawable.achivments);
-        addPicture(Recipe.SUN, R.drawable.achivments);
-        addPicture(Recipe.HATE, R.drawable.achivments);
-        addPicture(Recipe.STEAM, R.drawable.achivments);
+        addPicture(Recipe.WATER, R.drawable.water);
+        addPicture(Recipe.FIRE, R.drawable.fire);
+        addPicture(Recipe.TOOTH, R.drawable.tooth);
+        addPicture(Recipe.ICE, R.drawable.ice);
+        addPicture(Recipe.SUN, R.drawable.sun);
     }
 }
