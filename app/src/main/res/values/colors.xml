@@ -3,6 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
     <color name="colorPink">#FFC0CB</color>
+    <color name="colorBackground">#6B8E23</color>
+    <color name="colorCard">#8B8B00</color>
+    <color name="colorObject">#CD8500</color>
 </resources>
