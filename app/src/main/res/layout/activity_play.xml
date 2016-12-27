@@ -43,12 +43,36 @@
 
     </RelativeLayout>
 
-    <org.lucasr.twowayview.TwoWayView
-        android:id="@+id/created_objects_view"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/created_objects_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        >
+
+        <org.lucasr.twowayview.TwoWayView
+            android:id="@+id/created_objects_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:background="@color/colorBackground">
+
+            <Button
+                android:id="@+id/next_turn_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/next_turn"
+                />
+        </LinearLayout>
+    </RelativeLayout>
     <org.lucasr.twowayview.TwoWayView
         android:id="@+id/player_hand_view"
         android:layout_width="wrap_content"
