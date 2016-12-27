@@ -6,11 +6,13 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 
 import com.anastasia.potions.R;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
 import com.anastasia.potions.card.Card;
+import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.Game;
 import com.anastasia.potions.game.PlayerInfo;
 import com.anastasia.potions.adapter.HandCardAdapter;
@@ -57,6 +59,25 @@ public class GameActivity extends Activity {
         return (TwoWayView) findViewById(R.id.player_hand_view);
     }
 
+    Button getFirstScoreButton() {
+        return (Button) findViewById(R.id.first_score_button);
+    }
+
+    Button getSecondScoreButton() {
+        return (Button) findViewById(R.id.second_score_button);
+    }
+
+    void updateScore(Recipe recipe) {
+        game.getCurrentPlayer().increaseScore(recipe.score);
+        int updatedScore = game.getCurrentPlayer().getScore();
+
+        if (game.getCurrentPlayerIndex() == 0) {
+            getFirstScoreButton().setText(Integer.toString(updatedScore));
+        } else {
+            getSecondScoreButton().setText(Integer.toString(updatedScore));
+        }
+    }
+
     void fillPlayerHand() {
         final PlayerInfo currentPlayerInfo = game.getCurrentPlayer();
 
@@ -83,6 +104,8 @@ public class GameActivity extends Activity {
                                 Card card = currentPlayerInfo.removeCard(position);
                                 game.addToCupboard(card);
 
+                                updateScore(card.ingredient);
+
                                 getCupboardView().setAdapter(
                                         new CupboardCellAdapter(
                                                 GameActivity.this,
@@ -103,6 +126,8 @@ public class GameActivity extends Activity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Card card = currentPlayerInfo.removeCard(position);
                                 game.addToCreatedObjects(card);
+
+                                updateScore(card.complexRecipe);
 
                                 getCreatedObjectsView().setAdapter(
                                         new CreatedObjectAdapter(
