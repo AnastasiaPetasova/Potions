@@ -3,6 +3,7 @@ package com.anastasia.potions.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,9 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.adapter.GameListAdapter;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
+import com.anastasia.potions.adapter.GameListAdapter;
 import com.anastasia.potions.adapter.HandCardAdapter;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
@@ -22,7 +23,7 @@ import com.anastasia.potions.util.StringUtils;
 
 import org.lucasr.twowayview.TwoWayView;
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements CardInfoIntentActivity {
 
     Game game;
 
@@ -110,20 +111,28 @@ public class GameActivity extends Activity {
         getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final Card card = currentPlayerInfo.getCard(position);
+
                 new AlertDialog.Builder(GameActivity.this)
                         .setTitle("Выберите действиe")
                         .setMessage("Использовать ингредиент или сложный рецепт?")
                         .setCancelable(true)
-                        .setNeutralButton("Никак", new DialogInterface.OnClickListener() {
+                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
+                                intent.putExtra(OWNER, "В руке " + currentPlayerInfo.getName());
+                                intent.putExtra(INGREDIENT, card.ingredient.name());
+                                intent.putExtra(RECIPE, card.complexRecipe.name());
+
+                                startActivity(intent);
                             }
                         })
                         .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Card card = currentPlayerInfo.removeCard(position);
+                                currentPlayerInfo.removeCard(position);
                                 game.addToCupboard(card);
 
                                 updateScore(card.ingredient);
@@ -142,7 +151,7 @@ public class GameActivity extends Activity {
                         .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Card card = currentPlayerInfo.removeCard(position);
+                                currentPlayerInfo.removeCard(position);
                                 game.addToCreatedObjects(card);
 
                                 updateScore(card.complexRecipe);
