@@ -98,7 +98,7 @@ public class GameActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 new AlertDialog.Builder(GameActivity.this)
                         .setTitle("Выберите действиe")
-                        .setMessage("Использовать ингридиент или сложный рецепт?")
+                        .setMessage("Использовать ингредиент или сложный рецепт?")
                         .setCancelable(true)
                         .setNeutralButton("Никак", new DialogInterface.OnClickListener() {
                             @Override
