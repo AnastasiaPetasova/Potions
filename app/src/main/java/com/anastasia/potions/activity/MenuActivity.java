@@ -9,8 +9,6 @@ import android.view.View;
 import com.anastasia.potions.R;
 import com.anastasia.potions.util.ActivityUtils;
 
-me.Game;
-
 public class MenuActivity extends Activity {
 
     @Override
