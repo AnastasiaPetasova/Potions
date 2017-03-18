@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.anastasia.potions.R;
 import com.anastasia.potions.game.CupboardCell;
+import com.anastasia.potions.util.StringUtils;
 
 public class CupboardCellView extends LinearLayout {
 
@@ -38,7 +39,7 @@ public class CupboardCellView extends LinearLayout {
 
     public void setCount(int count) {
         getCountView().setText(
-                Integer.toString(count)
+                StringUtils.intToString(count)
         );
 
         refreshDrawableState();
