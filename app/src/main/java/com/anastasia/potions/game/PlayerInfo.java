@@ -25,6 +25,8 @@ public class PlayerInfo {
         cards.add(card);
     }
 
+    public Card getCard(int index) { return cards.get(index); }
+
     public Card removeCard(int index) {
         return cards.remove(index);
     }
