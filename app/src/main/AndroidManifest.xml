@@ -21,7 +21,10 @@
         <activity
             android:name=".activity.GameActivity"
             android:screenOrientation="landscape">
-
+        </activity>
+        <activity
+            android:name=".activity.CardInfoActivity"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 
