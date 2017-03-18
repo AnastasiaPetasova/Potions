@@ -5,12 +5,10 @@ import android.content.Context;
 import com.anastasia.potions.game.CupboardCell;
 import com.anastasia.potions.view.CupboardCellView;
 
-import java.util.List;
+public class CupboardCellAdapter extends GameListAdapter<CupboardCell, CupboardCellView> {
 
-public class CupboardCellAdapter extends AbstractListAdapter<CupboardCell, CupboardCellView> {
-
-    public CupboardCellAdapter(Context context, List<CupboardCell> cupboardCells) {
-        super(context, cupboardCells);
+    public CupboardCellAdapter(Context context) {
+        super(context);
     }
 
     @Override

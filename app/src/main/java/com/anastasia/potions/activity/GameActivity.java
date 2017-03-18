@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
+import com.anastasia.potions.adapter.GameListAdapter;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
 import com.anastasia.potions.adapter.HandCardAdapter;
@@ -17,6 +18,7 @@ import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.Game;
 import com.anastasia.potions.game.PlayerInfo;
+import com.anastasia.potions.util.StringUtils;
 
 import org.lucasr.twowayview.TwoWayView;
 
@@ -29,12 +31,22 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        drawGameField();
+        initGameField();
         startGame();
     }
 
-    void drawGameField() {
+    void initGameField() {
+        getHandView().setAdapter(
+                new HandCardAdapter(this)
+        );
 
+        getCupboardView().setAdapter(
+                new CupboardCellAdapter(this)
+        );
+
+        getCreatedObjectsView().setAdapter(
+                new CreatedObjectAdapter(this)
+        );
     }
 
     void startGame() {
@@ -61,23 +73,24 @@ public class GameActivity extends Activity {
         return (TwoWayView) findViewById(R.id.player_hand_view);
     }
 
-    Button getFirstScoreButton() {
-        return (Button) findViewById(R.id.first_score_button);
-    }
+    private static final int[] SCORE_BUTTON_IDS = {
+            R.id.first_score_button,
+            R.id.second_score_button
+    };
 
-    Button getSecondScoreButton() {
-        return (Button) findViewById(R.id.second_score_button);
+    Button getScoreButton(int playerIndex) {
+        return (Button) findViewById(SCORE_BUTTON_IDS[playerIndex]);
     }
 
     void updateScore(Recipe recipe) {
         game.getCurrentPlayer().increaseScore(recipe.score);
-        int updatedScore = game.getCurrentPlayer().getScore();
 
-        if (game.getCurrentPlayerIndex() == 0) {
-            getFirstScoreButton().setText(Integer.toString(updatedScore));
-        } else {
-            getSecondScoreButton().setText(Integer.toString(updatedScore));
-        }
+        int updatedScore = game.getCurrentPlayer().getScore();
+        String updatedScoreText = StringUtils.intToString(updatedScore);
+
+        getScoreButton(
+                game.getCurrentPlayerIndex()
+        ).setText(updatedScoreText);
     }
 
     void updatePlayerName() {
@@ -89,8 +102,9 @@ public class GameActivity extends Activity {
     void fillPlayerHand() {
         final PlayerInfo currentPlayerInfo = game.getCurrentPlayer();
 
-        getHandView().setAdapter(
-                new HandCardAdapter(this, currentPlayerInfo.getCards())
+        GameListAdapter.setValues(
+                getHandView().getAdapter(),
+                currentPlayerInfo.getCards()
         );
 
         getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,18 +128,14 @@ public class GameActivity extends Activity {
 
                                 updateScore(card.ingredient);
 
-                                getCupboardView().setAdapter(
-                                        new CupboardCellAdapter(
-                                                GameActivity.this,
-                                                game.getCupboard()
-                                        )
+                                GameListAdapter.setValues(
+                                        getCupboardView().getAdapter(),
+                                        game.getCupboard()
                                 );
 
-                                getHandView().setAdapter(
-                                        new HandCardAdapter(
-                                                GameActivity.this,
-                                                currentPlayerInfo.getCards()
-                                        )
+                                GameListAdapter.setValues(
+                                        getHandView().getAdapter(),
+                                        currentPlayerInfo.getCards()
                                 );
                             }
                         })
@@ -137,18 +147,14 @@ public class GameActivity extends Activity {
 
                                 updateScore(card.complexRecipe);
 
-                                getCreatedObjectsView().setAdapter(
-                                        new CreatedObjectAdapter(
-                                                GameActivity.this,
-                                                game.getCreatedObjects()
-                                        )
+                                GameListAdapter.setValues(
+                                        getCreatedObjectsView().getAdapter(),
+                                        game.getCreatedObjects()
                                 );
 
-                                getHandView().setAdapter(
-                                        new HandCardAdapter(
-                                                GameActivity.this,
-                                                currentPlayerInfo.getCards()
-                                        )
+                                GameListAdapter.setValues(
+                                        getHandView().getAdapter(),
+                                        currentPlayerInfo.getCards()
                                 );
                             }
                         }).show();
