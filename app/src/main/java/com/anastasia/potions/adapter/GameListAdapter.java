@@ -13,6 +13,10 @@ import java.util.List;
 
 public abstract class GameListAdapter<ValueType, ViewType extends View> extends BaseAdapter {
 
+    public static void updateValues(Adapter adapter) {
+        ClassUtils.<BaseAdapter>cast(adapter).notifyDataSetChanged();
+    }
+
     public static <ValueType> void setValues(Adapter adapter, List<ValueType> values){
         ClassUtils.<GameListAdapter<ValueType, ?>>cast(adapter).setValues(values);
     }
