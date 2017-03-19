@@ -3,6 +3,7 @@ package com.anastasia.potions.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
@@ -20,6 +21,11 @@ public class CardInfoActivity extends Activity implements CardInfoIntentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_info);
 
+        getOwnerView().setFocusable(false);
+        getIngredientInfoView().setFocusable(false);
+        getRecipeInfoView().setFocusable(false);
+        getRecipeNeedsView().setFocusable(false);
+
         Intent cardsInfo = getIntent();
         showInfo(cardsInfo);
     }
@@ -36,22 +42,30 @@ public class CardInfoActivity extends Activity implements CardInfoIntentActivity
     }
 
     private void showIngredientInfo(Intent cardsInfo) {
-        Recipe ingredient = Recipe.valueOf(cardsInfo.getStringExtra(INGREDIENT));
-        getIngredientInfoView().setRecipe(ingredient);
+        Recipe ingredient = (Recipe)cardsInfo.getSerializableExtra(INGREDIENT);
+        if (null == ingredient) {
+            getIngredientInfoView().setVisibility(View.INVISIBLE);
+        } else {
+            getIngredientInfoView().setRecipe(ingredient);
+        }
     }
 
     private void showRecipeInfo(Intent cardsInfo) {
-        Recipe complexRecipe = Recipe.valueOf(cardsInfo.getStringExtra(RECIPE));
-        getRecipeInfoView().setRecipe(complexRecipe);
+        Recipe complexRecipe = (Recipe)cardsInfo.getSerializableExtra(RECIPE);
+        if (null == complexRecipe) {
+            getRecipeInfoView().setVisibility(View.INVISIBLE);
+        } else {
+            getRecipeInfoView().setRecipe(complexRecipe);
 
-        getRecipeNeedsView().setAdapter(
-                new RecipeAdapter(this)
-        );
+            getRecipeNeedsView().setAdapter(
+                    new RecipeAdapter(this)
+            );
 
-        GameListAdapter.setValues(
-                getRecipeNeedsView().getAdapter(),
-                complexRecipe.mixedRecipes
-        );
+            GameListAdapter.setValues(
+                    getRecipeNeedsView().getAdapter(),
+                    complexRecipe.mixedRecipes
+            );
+        }
     }
 
     private TextView getOwnerView() {
