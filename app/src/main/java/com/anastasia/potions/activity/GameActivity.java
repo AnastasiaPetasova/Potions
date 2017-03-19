@@ -17,6 +17,8 @@ import com.anastasia.potions.adapter.GameListAdapter;
 import com.anastasia.potions.adapter.HandCardAdapter;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
+import com.anastasia.potions.game.CreatedObject;
+import com.anastasia.potions.game.CupboardCell;
 import com.anastasia.potions.game.Game;
 import com.anastasia.potions.game.PlayerInfo;
 import com.anastasia.potions.util.StringUtils;
@@ -37,24 +39,146 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
     }
 
     void initGameField() {
+        initHand();
+        initCupboard();
+        initCreatedObjects();
+    }
+
+    void initHand() {
         getHandView().setAdapter(
                 new HandCardAdapter(this)
         );
 
+        getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final PlayerInfo currentPlayerInfo = game.getCurrentPlayer();
+                final Card card = currentPlayerInfo.getCard(position);
+
+                new AlertDialog.Builder(GameActivity.this)
+                        .setTitle("Выберите действиe")
+                        .setMessage("Использовать ингредиент или сложный рецепт?")
+                        .setCancelable(true)
+                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
+
+                                intent.putExtra(OWNER, "В руке игрока " + currentPlayerInfo.getName());
+                                intent.putExtra(INGREDIENT, card.ingredient);
+                                intent.putExtra(RECIPE, card.complexRecipe);
+
+                                startActivity(intent);
+                            }
+                        })
+                        .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                currentPlayerInfo.removeCard(position);
+                                game.addToCupboard(card);
+
+                                updateScore(card.ingredient);
+
+                                GameListAdapter.updateValues(
+                                        getCupboardView().getAdapter()
+                                );
+
+                                GameListAdapter.updateValues(
+                                        getHandView().getAdapter()
+                                );
+                            }
+                        })
+                        .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                currentPlayerInfo.removeCard(position);
+                                game.addToCreatedObjects(card);
+
+                                updateScore(card.complexRecipe);
+
+                                GameListAdapter.updateValues(
+                                        getCreatedObjectsView().getAdapter()
+                                );
+
+                                GameListAdapter.updateValues(
+                                        getHandView().getAdapter()
+                                );
+                            }
+                        }).show();
+            }
+        });
+    }
+
+    void initCupboard() {
         getCupboardView().setAdapter(
                 new CupboardCellAdapter(this)
         );
 
+        getCupboardView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final CupboardCell cell = game.getCupboard().get(position);
+
+                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
+
+                intent.putExtra(OWNER, "В буфете ингредиент " + cell.ingredient.getLocaleName());
+                intent.putExtra(INGREDIENT, cell.ingredient);
+
+                startActivity(intent);
+            }
+        });
+    }
+
+    void initCreatedObjects() {
         getCreatedObjectsView().setAdapter(
                 new CreatedObjectAdapter(this)
         );
+
+        getCreatedObjectsView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final CreatedObject createdObject = game.getCreatedObjects().get(position);
+
+                new AlertDialog.Builder(GameActivity.this)
+                        .setTitle("Выберите действиe")
+                        .setMessage("Использовать рецепт в сборке?")
+                        .setCancelable(true)
+                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
+
+                                intent.putExtra(OWNER, "Рецепт, созданный игроком " + createdObject.player.name);
+                                intent.putExtra(INGREDIENT, createdObject.baseCard.ingredient);
+                                intent.putExtra(RECIPE, createdObject.baseCard.complexRecipe);
+
+                                startActivity(intent);
+                            }
+                        }).show();
+            }
+        });
     }
 
     void startGame() {
-        this.game = Game.create();
+        createGame();
+
         game.start();
 
         startTurn();
+    }
+
+    void createGame() {
+        this.game = Game.create();
+
+        GameListAdapter.setValues(
+                getCupboardView().getAdapter(),
+                game.getCupboard()
+        );
+
+        GameListAdapter.setValues(
+                getCreatedObjectsView().getAdapter(),
+                game.getCreatedObjects()
+        );
     }
 
     void startTurn() {
@@ -107,68 +231,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
                 getHandView().getAdapter(),
                 currentPlayerInfo.getCards()
         );
-
-        getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final Card card = currentPlayerInfo.getCard(position);
-
-                new AlertDialog.Builder(GameActivity.this)
-                        .setTitle("Выберите действиe")
-                        .setMessage("Использовать ингредиент или сложный рецепт?")
-                        .setCancelable(true)
-                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
-
-                                intent.putExtra(OWNER, "В руке " + currentPlayerInfo.getName());
-                                intent.putExtra(INGREDIENT, card.ingredient.name());
-                                intent.putExtra(RECIPE, card.complexRecipe.name());
-
-                                startActivity(intent);
-                            }
-                        })
-                        .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                currentPlayerInfo.removeCard(position);
-                                game.addToCupboard(card);
-
-                                updateScore(card.ingredient);
-
-                                GameListAdapter.setValues(
-                                        getCupboardView().getAdapter(),
-                                        game.getCupboard()
-                                );
-
-                                GameListAdapter.setValues(
-                                        getHandView().getAdapter(),
-                                        currentPlayerInfo.getCards()
-                                );
-                            }
-                        })
-                        .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                currentPlayerInfo.removeCard(position);
-                                game.addToCreatedObjects(card);
-
-                                updateScore(card.complexRecipe);
-
-                                GameListAdapter.setValues(
-                                        getCreatedObjectsView().getAdapter(),
-                                        game.getCreatedObjects()
-                                );
-
-                                GameListAdapter.setValues(
-                                        getHandView().getAdapter(),
-                                        currentPlayerInfo.getCards()
-                                );
-                            }
-                        }).show();
-            }
-        });
     }
 
     public void nextTurn(View v) {
