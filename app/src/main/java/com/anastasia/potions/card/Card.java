@@ -6,7 +6,7 @@ public class Card implements Cloneable {
     public Recipe complexRecipe;
 
     public static Card create(Recipe ingredient, Recipe complexRecipe) {
-        if (!ingredient.isIngredient()) throw new RuntimeException("Первый параметр карты должен быть ингридиентом");
+        if (!ingredient.isIngredient()) throw new RuntimeException("Первый параметр карты должен быть ингредиентом");
         if (complexRecipe.isIngredient()) throw new RuntimeException("Второй параметр карты должен быть сложным рецептом");
 
         return new Card(ingredient, complexRecipe);
