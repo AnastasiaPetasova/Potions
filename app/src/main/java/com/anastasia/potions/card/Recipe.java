@@ -21,6 +21,11 @@ public enum Recipe implements Iterable<Recipe> {
         this.mixedRecipes = Arrays.asList(recipes);
     }
 
+    // TODO change after full 'russianization'
+    public String getLocaleName() {
+        return name();
+    }
+
     public boolean isIngredient() {
         return mixedRecipes.isEmpty();
     }
