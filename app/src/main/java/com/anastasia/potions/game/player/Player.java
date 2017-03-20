@@ -1,4 +1,4 @@
-package com.anastasia.potions.game;
+package com.anastasia.potions.game.player;
 
 public class Player {
 

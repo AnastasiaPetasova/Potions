@@ -1,4 +1,4 @@
-package com.anastasia.potions.game;
+package com.anastasia.potions.game.player;
 
 import com.anastasia.potions.card.Card;
 
@@ -7,9 +7,9 @@ import java.util.List;
 
 public class PlayerInfo {
 
-    Player player;
-    final List<Card> cards;
-    int score;
+    private Player player;
+    private final List<Card> cards;
+    private int score;
 
     public PlayerInfo(Player player) {
         this.player = player;
