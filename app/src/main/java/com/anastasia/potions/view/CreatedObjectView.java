@@ -30,14 +30,14 @@ public class CreatedObjectView extends LinearLayout {
     }
 
     public void setCreatedObject(CreatedObject createdObject) {
-        CardView recipeCard = getRecipeView();
+        RecipeView recipeCard = getRecipeView();
         recipeCard.setRecipe(createdObject.baseRecipe);
 
         getPlayerNameView().setText(createdObject.player.name);
     }
 
-    public CardView getRecipeView() {
-        return (CardView)findViewById(R.id.recipe_view);
+    public RecipeView getRecipeView() {
+        return (RecipeView)findViewById(R.id.recipe_view);
     }
 
     public TextView getPlayerNameView() { return (TextView) findViewById(R.id.player_name_view); }
