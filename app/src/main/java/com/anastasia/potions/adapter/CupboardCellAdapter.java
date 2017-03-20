@@ -2,7 +2,7 @@ package com.anastasia.potions.adapter;
 
 import android.content.Context;
 
-import com.anastasia.potions.game.CupboardCell;
+import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.view.CupboardCellView;
 
 public class CupboardCellAdapter extends GameListAdapter<CupboardCell, CupboardCellView> {

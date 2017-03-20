@@ -6,7 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.game.CupboardCell;
+import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.util.StringUtils;
 
 public class CupboardCellView extends LinearLayout {

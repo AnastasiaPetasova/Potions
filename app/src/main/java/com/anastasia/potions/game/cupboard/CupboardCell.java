@@ -1,4 +1,4 @@
-package com.anastasia.potions.game;
+package com.anastasia.potions.game.cupboard;
 
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
