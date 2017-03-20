@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Potions</string>
     <string name="card_info_owner_label">Позиция карты: </string>
-    <string name="card_ingredient_recipe_label">Ингредиент и рецепт на карте</string>
-    <string name="card_mixed_recipes_label">Состав рецепта</string>
+    <string name="ingredient_label">Ингредиент</string>
 </resources>
