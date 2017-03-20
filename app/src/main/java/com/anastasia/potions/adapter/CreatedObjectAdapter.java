@@ -2,7 +2,7 @@ package com.anastasia.potions.adapter;
 
 import android.content.Context;
 
-import com.anastasia.potions.game.CreatedObject;
+import com.anastasia.potions.game.creating.CreatedObject;
 import com.anastasia.potions.view.CreatedObjectView;
 
 public class CreatedObjectAdapter extends GameListAdapter<CreatedObject, CreatedObjectView> {
