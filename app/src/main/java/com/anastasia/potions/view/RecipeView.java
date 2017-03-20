@@ -35,7 +35,7 @@ public class RecipeView extends LinearLayout {
     public void setRecipe(Recipe recipe) {
         @DrawableRes int recipePictureId = CardPictures.getPictureId(recipe);
         getImageView().setImageResource(recipePictureId);
-        getTextView().setText(recipe.getLocaleName());
+        getTextView().setText(recipe.getLocalName());
     }
 
     public ImageView getImageView() {

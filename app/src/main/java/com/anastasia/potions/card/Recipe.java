@@ -22,7 +22,7 @@ public enum Recipe implements Iterable<Recipe> {
         this.mixedRecipes = Arrays.asList(recipes);
     }
 
-    public String getLocaleName() {
+    public String getLocalName() {
         return RecipeLocalization.getLocalName(this);
     }
 
