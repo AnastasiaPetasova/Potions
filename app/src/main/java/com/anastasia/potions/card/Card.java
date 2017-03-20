@@ -1,6 +1,8 @@
 package com.anastasia.potions.card;
 
-public class Card implements Cloneable {
+import java.io.Serializable;
+
+public class Card implements Cloneable, Serializable {
 
     public Recipe ingredient;
     public Recipe complexRecipe;
