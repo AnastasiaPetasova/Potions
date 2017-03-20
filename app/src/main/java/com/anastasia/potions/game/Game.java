@@ -3,6 +3,7 @@ package com.anastasia.potions.game;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.creating.CreatedObject;
+import com.anastasia.potions.game.cupboard.Cupboard;
 import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.player.Player;
 import com.anastasia.potions.game.player.PlayerInfo;
@@ -10,6 +11,7 @@ import com.anastasia.potions.game.player.PlayerInfo;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +26,7 @@ public class Game {
     private final static int PLAYER_HAND_SIZE = 7;
 
     private Deque<Card> deck;
-    private List<CupboardCell> cupboard;
-
+    private Cupboard cupboard;
     private List<CreatedObject> createdObjects;
 
     private int currentPlayerIndex;
@@ -53,15 +54,22 @@ public class Game {
             }
         }
 
+        Collections.sort(ingredients, new Comparator<Recipe>() {
+            @Override
+            public int compare(Recipe left, Recipe right) {
+                String leftLocalName = left.getLocalName();
+                String rightLocalName = right.getLocalName();
+
+                return leftLocalName.compareTo(rightLocalName);
+            }
+        });
+
         List<Card> deckList = generateCards(ingredients, complexRecipes, DIFFERENT_CARDS_COUNT, EACH_CARD_COUNT);
         Collections.shuffle(deckList);
 
         Deque<Card> deck = new ArrayDeque<>(deckList);
 
-        List<CupboardCell> cupboard = new ArrayList<>();
-        for (Recipe ingredient : ingredients) {
-            cupboard.add(new CupboardCell(ingredient));
-        }
+        Cupboard cupboard = Cupboard.createWith(ingredients);
 
         List<CreatedObject> createdObjects = new ArrayList<>();
 
@@ -94,7 +102,7 @@ public class Game {
         return deckList;
     }
 
-    private Game(Deque<Card> deck, List<CupboardCell> cupboard,
+    private Game(Deque<Card> deck, Cupboard cupboard,
                  List<CreatedObject> createdObjects, List<PlayerInfo> players) {
         this.deck = deck;
         this.cupboard = cupboard;
@@ -125,29 +133,12 @@ public class Game {
         fillPlayerHand(currentPlayer);
     }
 
-    private CupboardCell getCupboardCellFor(final Recipe ingredient) {
-        for (CupboardCell cupboardCell : cupboard) {
-            if (cupboardCell.ingredient == ingredient) {
-                return cupboardCell;
-            }
-        }
-
-        // у нас всегда должна быть ячейка для ингредиента
-        throw new UnsupportedOperationException();
-    }
-
     public void addToCupboard(Card card) {
-        CupboardCell cupboardCell = getCupboardCellFor(card.ingredient);
-        cupboardCell.addCard(card);
+        cupboard.add(card);
     }
 
-    public int getCupboardCount(Recipe ingredient) {
-        CupboardCell cupboardCell = getCupboardCellFor(ingredient);
-        return cupboardCell.getCardsCount();
-    }
-
-    public List<CupboardCell> getCupboard() {
-        return cupboard;
+    public List<CupboardCell> getCupboardCells() {
+        return cupboard.getCells();
     }
 
     public void addToCreatedObjects(Card card) {

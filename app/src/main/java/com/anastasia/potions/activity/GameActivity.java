@@ -130,7 +130,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
         GameListAdapter.setValues(
                 getCupboardView().getAdapter(),
-                game.getCupboard()
+                game.getCupboardCells()
         );
 
         GameListAdapter.setValues(
@@ -243,7 +243,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
     }
 
     void showCupboardCellInfo(int position) {
-        final CupboardCell cell = game.getCupboard().get(position);
+        final CupboardCell cell = game.getCupboardCells().get(position);
 
         Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
