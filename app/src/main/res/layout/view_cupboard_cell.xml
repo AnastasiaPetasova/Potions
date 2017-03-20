@@ -6,7 +6,7 @@
     android:background="@drawable/background_selector_object"
     android:layout_margin="@dimen/recipe_picture_padding">
 
-    <com.anastasia.potions.view.CardView
+    <com.anastasia.potions.view.RecipeView
         android:id="@+id/ingredient_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
