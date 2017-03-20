@@ -54,8 +54,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final PlayerInfo currentPlayerInfo = game.getCurrentPlayer();
-                final Card card = currentPlayerInfo.getCard(position);
+                final PlayerInfo currentPlayer = game.getCurrentPlayer();
 
                 new AlertDialog.Builder(GameActivity.this)
                         .setTitle("Выберите действиe")
@@ -64,46 +63,19 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
                         .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
-
-                                intent.putExtra(POSITION, "В руке игрока " + currentPlayerInfo.getName());
-                                intent.putExtra(CARD, card);
-
-                                startActivity(intent);
+                                showHandCardInfo(currentPlayer, position);
                             }
                         })
                         .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                currentPlayerInfo.removeCard(position);
-                                game.addToCupboard(card);
-
-                                updateScore(card.ingredient);
-
-                                GameListAdapter.updateValues(
-                                        getCupboardView().getAdapter()
-                                );
-
-                                GameListAdapter.updateValues(
-                                        getHandView().getAdapter()
-                                );
+                                playIngredient(currentPlayer, position);
                             }
                         })
                         .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                currentPlayerInfo.removeCard(position);
-                                game.addToCreatedObjects(card);
-
-                                updateScore(card.complexRecipe);
-
-                                GameListAdapter.updateValues(
-                                        getCreatedObjectsView().getAdapter()
-                                );
-
-                                GameListAdapter.updateValues(
-                                        getHandView().getAdapter()
-                                );
+                                playComplexRecipe(currentPlayer, position);
                             }
                         }).show();
             }
@@ -118,18 +90,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         getCupboardView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final CupboardCell cell = game.getCupboard().get(position);
-
-                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
-
-                intent.putExtra(POSITION, "Ингредиент в шкафу");
-                intent.putExtra(INGREDIENT, cell.ingredient);
-
-                intent.putExtra(CARDS_LIST_NAME, "Стопка карт-ингредиентов");
-                intent.putExtra(CARDS_LIST, new ArrayList<>(cell.cards));
-                intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "%d-я сверху карта в стопке");
-
-                startActivity(intent);
+                showCupboardCellInfo(position);
             }
         });
     }
@@ -142,8 +103,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         getCreatedObjectsView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final CreatedObject createdObject = game.getCreatedObjects().get(position);
-
                 new AlertDialog.Builder(GameActivity.this)
                         .setTitle("Выберите действиe")
                         .setMessage("Использовать рецепт в сборке?")
@@ -151,17 +110,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
                         .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
-
-                                intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.name);
-                                intent.putExtra(CARD, createdObject.baseCard);
-
-                                intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
-                                intent.putExtra(CARDS_LIST, createdObject.getSerializableUsedCards());
-
-                                intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "Карта в составе рецепта");
-
-                                startActivity(intent);
+                                showCreatedObjectInfo(position);
                             }
                         }).show();
             }
@@ -193,38 +142,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
     void startTurn() {
         updatePlayerName();
         fillPlayerHand();
-    }
-
-    TwoWayView getCupboardView() {
-        return (TwoWayView) findViewById(R.id.cupboard_view);
-    }
-
-    TwoWayView getCreatedObjectsView() {
-        return (TwoWayView) findViewById(R.id.created_objects_view);
-    }
-
-    TwoWayView getHandView() {
-        return (TwoWayView) findViewById(R.id.player_hand_view);
-    }
-
-    private static final int[] SCORE_BUTTON_IDS = {
-            R.id.first_score_button,
-            R.id.second_score_button
-    };
-
-    Button getScoreButton(int playerIndex) {
-        return (Button) findViewById(SCORE_BUTTON_IDS[playerIndex]);
-    }
-
-    void updateScore(Recipe recipe) {
-        game.getCurrentPlayer().increaseScore(recipe.score);
-
-        int updatedScore = game.getCurrentPlayer().getScore();
-        String updatedScoreText = StringUtils.intToString(updatedScore);
-
-        getScoreButton(
-                game.getCurrentPlayerIndex()
-        ).setText(updatedScoreText);
     }
 
     void updatePlayerName() {
@@ -271,5 +188,109 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
             endDialog.show();
         }
+    }
+
+    void updateScore(Recipe recipe) {
+        game.getCurrentPlayer().increaseScore(recipe.score);
+
+        int updatedScore = game.getCurrentPlayer().getScore();
+        String updatedScoreText = StringUtils.intToString(updatedScore);
+
+        getScoreButton(
+                game.getCurrentPlayerIndex()
+        ).setText(updatedScoreText);
+    }
+
+    void playIngredient(PlayerInfo currentPlayer, int position) {
+        Card card = currentPlayer.removeCard(position);
+        game.addToCupboard(card);
+
+        updateScore(card.ingredient);
+
+        GameListAdapter.updateValues(
+                getCupboardView().getAdapter()
+        );
+
+        GameListAdapter.updateValues(
+                getHandView().getAdapter()
+        );
+    }
+
+    void playComplexRecipe(PlayerInfo currentPlayer, int position) {
+        Card card = currentPlayer.removeCard(position);
+        game.addToCreatedObjects(card);
+
+        updateScore(card.complexRecipe);
+
+        GameListAdapter.updateValues(
+                getCreatedObjectsView().getAdapter()
+        );
+
+        GameListAdapter.updateValues(
+                getHandView().getAdapter()
+        );
+    }
+
+    void showHandCardInfo(PlayerInfo currentPlayer, int position) {
+        Card card = currentPlayer.getCard(position);
+
+        Intent intent = new Intent(this, CardInfoActivity.class);
+
+        intent.putExtra(POSITION, "В руке игрока " + currentPlayer.getName());
+        intent.putExtra(CARD, card);
+
+        startActivity(intent);
+    }
+
+    void showCupboardCellInfo(int position) {
+        final CupboardCell cell = game.getCupboard().get(position);
+
+        Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
+
+        intent.putExtra(POSITION, "Ингредиент в шкафу");
+        intent.putExtra(INGREDIENT, cell.ingredient);
+
+        intent.putExtra(CARDS_LIST_NAME, "Стопка карт-ингредиентов");
+        intent.putExtra(CARDS_LIST, new ArrayList<>(cell.cards));
+        intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "%d-я сверху карта в стопке");
+
+        startActivity(intent);
+    }
+
+    void showCreatedObjectInfo(int position) {
+        CreatedObject createdObject = game.getCreatedObjects().get(position);
+
+        Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
+
+        intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.name);
+        intent.putExtra(CARD, createdObject.baseCard);
+
+        intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
+        intent.putExtra(CARDS_LIST, createdObject.getSerializableUsedCards());
+
+        intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "Карта в составе рецепта");
+
+        startActivity(intent);
+    }
+
+    private static final int[] SCORE_BUTTON_IDS = {
+            R.id.first_score_button,
+            R.id.second_score_button
+    };
+
+    Button getScoreButton(int playerIndex) {
+        return (Button) findViewById(SCORE_BUTTON_IDS[playerIndex]);
+    }
+
+    TwoWayView getCupboardView() {
+        return (TwoWayView) findViewById(R.id.cupboard_view);
+    }
+
+    TwoWayView getCreatedObjectsView() {
+        return (TwoWayView) findViewById(R.id.created_objects_view);
+    }
+
+    TwoWayView getHandView() {
+        return (TwoWayView) findViewById(R.id.player_hand_view);
     }
 }
