@@ -39,8 +39,8 @@ public class RecipeLocalization {
         putLocalName(RUSSIAN_LOCALE, Recipe.ICE, "Кубик льда");
         putLocalName(ENGLISH_LOCALE, Recipe.ICE, "Ice cube");
 
-        putLocalName(RUSSIAN_LOCALE, Recipe.SUN, "Солнечный зайчик");
-        putLocalName(ENGLISH_LOCALE, Recipe.SUN, "Sunny bunny");
+        putLocalName(RUSSIAN_LOCALE, Recipe.SUN, "Лучик солнца");
+        putLocalName(ENGLISH_LOCALE, Recipe.SUN, "Sunny ray");
 
         putLocalName(RUSSIAN_LOCALE, Recipe.PRISM, "Призма");
         putLocalName(ENGLISH_LOCALE, Recipe.PRISM, "Prism");
