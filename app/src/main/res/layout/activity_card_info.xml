@@ -19,50 +19,75 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/card_info_margin"
                 android:textSize="@dimen/card_info_text_size"
                 android:text="@string/card_info_owner_label"/>
 
             <TextView
-                android:id="@+id/owner_text_view"
+                android:id="@+id/position_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="@dimen/card_info_text_size"/>
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/card_info_margin_top"
-            android:textSize="@dimen/card_info_text_size"
-            android:text="@string/card_ingredient_recipe_label"/>
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.anastasia.potions.view.CardView
-                android:id="@+id/ingredient_info_view"
+            <LinearLayout
+                android:id="@+id/ingredient_info_layout"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/card_info_margin">
 
-            <com.anastasia.potions.view.CardView
-                android:id="@+id/recipe_info_view"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/card_info_margin"
+                    android:textSize="@dimen/card_info_text_size"
+                    android:text="@string/ingredient_label"/>
+
+                <com.anastasia.potions.view.RecipeView
+                    android:id="@+id/ingredient_info_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/recipe_info_layout"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/recipe_info_text_label"
+                    android:layout_marginTop="@dimen/card_info_margin"
+                    android:textSize="@dimen/card_info_text_size" />
+
+                <com.anastasia.potions.view.RecipeView
+                    android:id="@+id/recipe_info_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/cards_list_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/card_info_margin_top"
-            android:textSize="@dimen/card_info_text_size"
-            android:text="@string/card_mixed_recipes_label"/>
+            android:layout_marginTop="@dimen/card_info_margin"
+            android:textSize="@dimen/card_info_text_size" />
 
         <org.lucasr.twowayview.TwoWayView
-            android:id="@+id/recipe_needs_view"
+            android:id="@+id/cards_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" />
