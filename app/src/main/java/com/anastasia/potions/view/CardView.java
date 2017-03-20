@@ -1,15 +1,11 @@
 package com.anastasia.potions.view;
 
 import android.content.Context;
-import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.card.CardPictures;
-import com.anastasia.potions.card.Recipe;
+import com.anastasia.potions.card.Card;
 
 public class CardView extends LinearLayout {
 
@@ -32,17 +28,19 @@ public class CardView extends LinearLayout {
         inflate(getContext(), R.layout.view_card, this);
     }
 
-    public void setRecipe(Recipe recipe) {
-        @DrawableRes int recipePictureId = CardPictures.getPictureId(recipe);
-        getImageView().setImageResource(recipePictureId);
-        getTextView().setText(recipe.getLocaleName());
+    public void setCard(Card card) {
+        RecipeView ingredientCard = getIngredientView();
+        ingredientCard.setRecipe(card.ingredient);
+
+        RecipeView complexRecipeCard = getComplexRecipeView();
+        complexRecipeCard.setRecipe(card.complexRecipe);
     }
 
-    public ImageView getImageView() {
-        return (ImageView)findViewById(R.id.card_image);
+    public RecipeView getIngredientView() {
+        return (RecipeView)findViewById(R.id.ingredient_view);
     }
 
-    public TextView getTextView() {
-        return (TextView)findViewById(R.id.card_title);
+    public RecipeView getComplexRecipeView() {
+        return (RecipeView)findViewById(R.id.created_objects_view);
     }
 }

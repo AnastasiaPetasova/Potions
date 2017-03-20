@@ -3,19 +3,19 @@ package com.anastasia.potions.adapter;
 import android.content.Context;
 
 import com.anastasia.potions.card.Recipe;
-import com.anastasia.potions.view.CardView;
+import com.anastasia.potions.view.RecipeView;
 
-public class RecipeAdapter extends GameListAdapter<Recipe, CardView> {
+public class RecipeAdapter extends GameListAdapter<Recipe, RecipeView> {
 
     public RecipeAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected CardView createView(Recipe recipe) {
-        CardView cardView = new CardView(context);
-        cardView.setRecipe(recipe);
+    protected RecipeView createView(Recipe recipe) {
+        RecipeView recipeView = new RecipeView(context);
+        recipeView.setRecipe(recipe);
 
-        return cardView;
+        return recipeView;
     }
 }
