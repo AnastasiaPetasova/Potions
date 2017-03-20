@@ -262,8 +262,8 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
         Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
-        intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.getName());
-        intent.putExtra(CARD, createdObject.baseCard);
+        intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.getPlayer().getName());
+        intent.putExtra(CARD, createdObject.getBaseCard());
 
         intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
         intent.putExtra(CARDS_LIST, createdObject.getSerializableUsedCards());

@@ -10,18 +10,26 @@ import java.util.List;
 
 public class CreatedObject {
 
-    public final PlayerInfo player;
-
-    public final Recipe baseRecipe;
-    public final Card baseCard;
-
+    private final PlayerInfo player;
+    private final Card baseCard;
     private List<Card> usedCards;
 
-    public CreatedObject(PlayerInfo player, Recipe baseRecipe, Card baseCard, List<Card> usedCards) {
+    public CreatedObject(PlayerInfo player, Card baseCard, List<Card> usedCards) {
         this.player = player;
-        this.baseRecipe = baseRecipe;
         this.baseCard = baseCard;
         this.usedCards = usedCards;
+    }
+
+    public PlayerInfo getPlayer() {
+        return player;
+    }
+
+    public Card getBaseCard() {
+        return baseCard;
+    }
+
+    public Recipe getBaseRecipe() {
+        return baseCard.complexRecipe;
     }
 
     public Serializable getSerializableUsedCards() {
