@@ -14,7 +14,7 @@ import com.anastasia.potions.R;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
 import com.anastasia.potions.adapter.GameListAdapter;
-import com.anastasia.potions.adapter.HandCardAdapter;
+import com.anastasia.potions.adapter.CardAdapter;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.CreatedObject;
@@ -24,6 +24,8 @@ import com.anastasia.potions.game.PlayerInfo;
 import com.anastasia.potions.util.StringUtils;
 
 import org.lucasr.twowayview.TwoWayView;
+
+import java.util.ArrayList;
 
 public class GameActivity extends Activity implements CardInfoIntentActivity {
 
@@ -46,7 +48,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
     void initHand() {
         getHandView().setAdapter(
-                new HandCardAdapter(this)
+                new CardAdapter(this)
         );
 
         getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -64,9 +66,8 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
-                                intent.putExtra(OWNER, "В руке игрока " + currentPlayerInfo.getName());
-                                intent.putExtra(INGREDIENT, card.ingredient);
-                                intent.putExtra(RECIPE, card.complexRecipe);
+                                intent.putExtra(POSITION, "В руке игрока " + currentPlayerInfo.getName());
+                                intent.putExtra(CARD, card);
 
                                 startActivity(intent);
                             }
@@ -121,8 +122,12 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
                 Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
-                intent.putExtra(OWNER, "В буфете ингредиент " + cell.ingredient.getLocaleName());
+                intent.putExtra(POSITION, "Ингредиент в шкафу");
                 intent.putExtra(INGREDIENT, cell.ingredient);
+
+                intent.putExtra(CARDS_LIST_NAME, "Стопка карт-ингредиентов");
+                intent.putExtra(CARDS_LIST, new ArrayList<>(cell.cards));
+                intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "%d-я сверху карта в стопке");
 
                 startActivity(intent);
             }
@@ -148,9 +153,13 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
-                                intent.putExtra(OWNER, "Рецепт, созданный игроком " + createdObject.player.name);
-                                intent.putExtra(INGREDIENT, createdObject.baseCard.ingredient);
-                                intent.putExtra(RECIPE, createdObject.baseCard.complexRecipe);
+                                intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.name);
+                                intent.putExtra(CARD, createdObject.baseCard);
+
+                                intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
+                                intent.putExtra(CARDS_LIST, createdObject.getSerializableUsedCards());
+
+                                intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "Карта в составе рецепта");
 
                                 startActivity(intent);
                             }
