@@ -145,7 +145,7 @@ public class Game {
         // TODO change with actual info about creating
         createdObjects.add(
                 new CreatedObject(
-                    getCurrentPlayer(), card.complexRecipe, card, new ArrayList<Card>()
+                    getCurrentPlayer(), card, new ArrayList<Card>()
                 )
         );
     }
