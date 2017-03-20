@@ -42,4 +42,9 @@ public class PlayerInfo {
     public String getName() {
         return player.name;
     }
+
+    @Override
+    public String toString() {
+        return player.toString();
+    }
 }
