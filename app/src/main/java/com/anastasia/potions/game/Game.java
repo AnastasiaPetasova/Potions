@@ -2,6 +2,10 @@ package com.anastasia.potions.game;
 
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
+import com.anastasia.potions.game.creating.CreatedObject;
+import com.anastasia.potions.game.cupboard.CupboardCell;
+import com.anastasia.potions.game.player.Player;
+import com.anastasia.potions.game.player.PlayerInfo;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -14,43 +18,30 @@ import java.util.Set;
 
 public class Game {
 
-    final static Random rnd = new Random();
+    private final static Random rnd = new Random();
 
-    final static int DIFFERENT_CARDS_COUNT = 6, EACH_CARD_COUNT = 5;
-    final static int PLAYER_HAND_SIZE = 7;
+    private final static int DIFFERENT_CARDS_COUNT = 9, EACH_CARD_COUNT = 5;
+    private final static int PLAYER_HAND_SIZE = 7;
 
-    public Deque<Card> deck;
-    public List<CupboardCell> cupboard;
+    private Deque<Card> deck;
+    private List<CupboardCell> cupboard;
 
-    public List<CreatedObject> createdObjects;
+    private List<CreatedObject> createdObjects;
 
-    int currentPlayerIndex;
-    public List<PlayerInfo> players;
+    private int currentPlayerIndex;
+    private List<PlayerInfo> players;
 
     public static Game create() {
         List<PlayerInfo> players = new ArrayList<>();
 
         players.add(
-                new PlayerInfo(new Player("Human 1"))
+                new PlayerInfo(new Player("Игрок 1"))
         );
 
         players.add(
-                new PlayerInfo(new Player("Human 2"))
+                new PlayerInfo(new Player("Игрок 2"))
         );
 
-        List<CupboardCell> cupboard = new ArrayList<>();
-
-        List<Card> deckList = generateCards(DIFFERENT_CARDS_COUNT, EACH_CARD_COUNT);
-        Collections.shuffle(deckList);
-
-        Deque<Card> deck = new ArrayDeque<>(deckList);
-
-        List<CreatedObject> createdObjects = new ArrayList<>();
-
-        return new Game(deck, cupboard, createdObjects, players);
-    }
-
-    private static List<Card> generateCards(int differentCardsCount, int eachCardCount) {
         List<Recipe> ingredients = new ArrayList<>();
         List<Recipe> complexRecipes = new ArrayList<>();
 
@@ -62,6 +53,24 @@ public class Game {
             }
         }
 
+        List<Card> deckList = generateCards(ingredients, complexRecipes, DIFFERENT_CARDS_COUNT, EACH_CARD_COUNT);
+        Collections.shuffle(deckList);
+
+        Deque<Card> deck = new ArrayDeque<>(deckList);
+
+        List<CupboardCell> cupboard = new ArrayList<>();
+        for (Recipe ingredient : ingredients) {
+            cupboard.add(new CupboardCell(ingredient));
+        }
+
+        List<CreatedObject> createdObjects = new ArrayList<>();
+
+        return new Game(deck, cupboard, createdObjects, players);
+    }
+
+    private static List<Card> generateCards(
+            List<Recipe> ingredients, List<Recipe> complexRecipes,
+            int differentCardsCount, int eachCardCount) {
         Set<Card> generatedCards = new HashSet<>();
         List<Card> deckList = new ArrayList<>();
 
@@ -94,11 +103,16 @@ public class Game {
         this.players = players;
     }
 
+    private void fillPlayerHand(PlayerInfo player) {
+        while (deck.size() > 0 && player.getCards().size() < PLAYER_HAND_SIZE) {
+            Card card = deck.poll();
+            player.addCard(card);
+        }
+    }
+
     public void start() {
-        for (int handSize = 0; handSize < PLAYER_HAND_SIZE; ++handSize) {
-            for (PlayerInfo playerInfo : players) {
-                playerInfo.addCard(deck.poll());
-            }
+        for (PlayerInfo player : players) {
+            fillPlayerHand(player);
         }
 
         currentPlayerIndex = 0;
@@ -107,33 +121,29 @@ public class Game {
     public void nextTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
-        while (deck.size() > 0 && getCurrentPlayer().getCards().size() < PLAYER_HAND_SIZE) {
-            getCurrentPlayer().addCard(deck.poll());
+        PlayerInfo currentPlayer = getCurrentPlayer();
+        fillPlayerHand(currentPlayer);
+    }
+
+    private CupboardCell getCupboardCellFor(final Recipe ingredient) {
+        for (CupboardCell cupboardCell : cupboard) {
+            if (cupboardCell.ingredient == ingredient) {
+                return cupboardCell;
+            }
         }
+
+        // у нас всегда должна быть ячейка для ингредиента
+        throw new UnsupportedOperationException();
     }
 
     public void addToCupboard(Card card) {
-        for (CupboardCell cupboardCell : cupboard) {
-            if (cupboardCell.ingredient == card.ingredient) {
-                cupboardCell.addCard(card);
-                return;
-            }
-        }
-
-        CupboardCell cupboardCell = new CupboardCell(card.ingredient);
+        CupboardCell cupboardCell = getCupboardCellFor(card.ingredient);
         cupboardCell.addCard(card);
-
-        cupboard.add(cupboardCell);
     }
 
     public int getCupboardCount(Recipe ingredient) {
-        for (CupboardCell cupboardCell : cupboard) {
-            if (cupboardCell.ingredient == ingredient) {
-                return cupboardCell.getCardsCount();
-            }
-        }
-
-        return 0;
+        CupboardCell cupboardCell = getCupboardCellFor(ingredient);
+        return cupboardCell.getCardsCount();
     }
 
     public List<CupboardCell> getCupboard() {
@@ -144,7 +154,7 @@ public class Game {
         // TODO change with actual info about creating
         createdObjects.add(
                 new CreatedObject(
-                    getCurrentPlayer().player, card.complexRecipe, card, new ArrayList<Card>()
+                    getCurrentPlayer(), card.complexRecipe, card, new ArrayList<Card>()
                 )
         );
     }
