@@ -17,10 +17,10 @@ import com.anastasia.potions.adapter.GameListAdapter;
 import com.anastasia.potions.adapter.CardAdapter;
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
-import com.anastasia.potions.game.CreatedObject;
-import com.anastasia.potions.game.CupboardCell;
+import com.anastasia.potions.game.creating.CreatedObject;
+import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.Game;
-import com.anastasia.potions.game.PlayerInfo;
+import com.anastasia.potions.game.player.PlayerInfo;
 import com.anastasia.potions.util.StringUtils;
 
 import org.lucasr.twowayview.TwoWayView;
@@ -262,7 +262,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
 
         Intent intent = new Intent(GameActivity.this, CardInfoActivity.class);
 
-        intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.name);
+        intent.putExtra(POSITION, "Рецепт, созданный игроком " + createdObject.player.getName());
         intent.putExtra(CARD, createdObject.baseCard);
 
         intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
