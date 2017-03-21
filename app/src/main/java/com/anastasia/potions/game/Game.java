@@ -2,7 +2,12 @@ package com.anastasia.potions.game;
 
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
-import com.anastasia.potions.game.creating.CreatedObject;
+import com.anastasia.potions.game.created.CreatedObject;
+import com.anastasia.potions.game.created.CreatedObjectsList;
+import com.anastasia.potions.game.creating.NotEnoughIngredientsException;
+import com.anastasia.potions.game.creating.RecipeBuilder;
+import com.anastasia.potions.game.creating.RecipeCreatingChecker;
+import com.anastasia.potions.game.creating.RecipeCreatingResult;
 import com.anastasia.potions.game.cupboard.Cupboard;
 import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.player.Player;
@@ -15,6 +20,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -25,23 +31,25 @@ public class Game {
     private final static int DIFFERENT_CARDS_COUNT = 9, EACH_CARD_COUNT = 5;
     private final static int PLAYER_HAND_SIZE = 7;
 
-    private Deque<Card> deck;
-    private Cupboard cupboard;
-    private List<CreatedObject> createdObjects;
+    private final Deque<Card> deck;
+    private final Cupboard cupboard;
+    private final CreatedObjectsList createdObjects;
 
     private int currentPlayerIndex;
-    private List<PlayerInfo> players;
+    private final List<PlayerInfo> players;
+
+    private RecipeBuilder recipeBuilder;
+
+    private static void addPlayer(List<PlayerInfo> players, Player player) {
+        int playerIndex = players.size();
+        players.add(new PlayerInfo(player, playerIndex));
+    }
 
     public static Game create() {
         List<PlayerInfo> players = new ArrayList<>();
 
-        players.add(
-                new PlayerInfo(new Player("Игрок 1"))
-        );
-
-        players.add(
-                new PlayerInfo(new Player("Игрок 2"))
-        );
+        addPlayer(players, new Player("Игрок 1"));
+        addPlayer(players, new Player("Игрок 2"));
 
         List<Recipe> ingredients = new ArrayList<>();
         List<Recipe> complexRecipes = new ArrayList<>();
@@ -70,8 +78,7 @@ public class Game {
         Deque<Card> deck = new ArrayDeque<>(deckList);
 
         Cupboard cupboard = Cupboard.createWith(ingredients);
-
-        List<CreatedObject> createdObjects = new ArrayList<>();
+        CreatedObjectsList createdObjects = new CreatedObjectsList();
 
         return new Game(deck, cupboard, createdObjects, players);
     }
@@ -102,13 +109,16 @@ public class Game {
         return deckList;
     }
 
-    private Game(Deque<Card> deck, Cupboard cupboard,
-                 List<CreatedObject> createdObjects, List<PlayerInfo> players) {
+    private Game(Deque<Card> deck,
+                 Cupboard cupboard, CreatedObjectsList createdObjects,
+                 List<PlayerInfo> players) {
         this.deck = deck;
         this.cupboard = cupboard;
         this.createdObjects = createdObjects;
         this.currentPlayerIndex = 0;
         this.players = players;
+
+        this.recipeBuilder = null;
     }
 
     private void fillPlayerHand(PlayerInfo player) {
@@ -133,7 +143,11 @@ public class Game {
         fillPlayerHand(currentPlayer);
     }
 
-    public void addToCupboard(Card card) {
+    public void playIngredient(int position) {
+        PlayerInfo currentPlayer = getCurrentPlayer();
+        Card card = currentPlayer.getCard(position);
+
+        getCurrentPlayer().removeCard(card);
         cupboard.add(card);
     }
 
@@ -141,17 +155,100 @@ public class Game {
         return cupboard.getCells();
     }
 
-    public void addToCreatedObjects(Card card) {
-        // TODO change with actual info about creating
-        createdObjects.add(
-                new CreatedObject(
-                    getCurrentPlayer(), card, new ArrayList<Card>()
-                )
+    public void startCreatingCardAt(int position) throws NotEnoughIngredientsException {
+        Card card = getCurrentPlayer().getCard(position);
+
+        RecipeCreatingChecker creatingChecker = RecipeCreatingChecker.create(card.complexRecipe, cupboard);
+        this.recipeBuilder = new RecipeBuilder(card, creatingChecker);
+    }
+
+    public int tryTakeCreatedObjectOn(int position) {
+        CreatedObject createdObject = createdObjects.get(position);
+        return recipeBuilder.tryTake(createdObject);
+    }
+
+    public void removeFromBuildOn(int position) {
+        CreatedObject createdObject = createdObjects.get(position);
+        recipeBuilder.removeFromBuild(createdObject);
+    }
+
+    public boolean canCreate() {
+        return recipeBuilder.canCreate();
+    }
+
+    public boolean createCard() {
+        RecipeCreatingResult recipeCreatingResult = recipeBuilder.create();
+        if (null == recipeCreatingResult) {
+            return false;
+        }
+
+        List<Card> usedCards = new ArrayList<>();
+        Set<PlayerInfo> creators = new HashSet<>();
+
+        PlayerInfo mainCreator = getCurrentPlayer();
+        creators.add(mainCreator);
+
+        List<Card> freeCards = new ArrayList<>();
+
+        for (CreatedObject takenObject : recipeCreatingResult.takenObjects) {
+            creators.add(takenObject.getPlayer());
+            usedCards.add(takenObject.getBaseCard());
+
+            createdObjects.remove(takenObject);
+            freeCards.addAll(takenObject.getUsedCards());
+        }
+
+        for (Map.Entry<Recipe, Integer> takenRecipeCount : recipeCreatingResult.takenRecipeCounts) {
+            Recipe recipe = takenRecipeCount.getKey();
+
+            if (recipe.isIngredient()) {
+                int count = takenRecipeCount.getValue();
+                for (int i = 0; i < count; ++i) {
+                    Card takenIngredientCard = cupboard.pollCardWith(recipe);
+                    usedCards.add(takenIngredientCard);
+                }
+            }
+        }
+
+        // remove card from hand
+        mainCreator.removeCard(recipeCreatingResult.createdCard);
+
+        // add card to created objects list
+        CreatedObject createdObject = new CreatedObject(
+                getCurrentPlayer(), recipeCreatingResult.createdCard, usedCards
         );
+
+        createdObjects.add(createdObject);
+
+        // update player scores
+        int score = createdObject.getBaseRecipe().score;
+        for (PlayerInfo creator : creators) {
+            if (mainCreator == creator) {
+                creator.increaseScore(score);
+            } else {
+                creator.increaseScore(score / 2);
+            }
+        }
+
+        // add cards to cupboard
+        for (Card card : freeCards) {
+            cupboard.add(card);
+        }
+
+        return closeCreatingMode();
+    }
+
+    public boolean closeCreatingMode() {
+        this.recipeBuilder = null;
+        return true;
     }
 
     public List<CreatedObject> getCreatedObjects() {
-        return createdObjects;
+        return createdObjects.toList();
+    }
+
+    public List<PlayerInfo> getPlayers() {
+        return players;
     }
 
     public PlayerInfo getCurrentPlayer() {
@@ -161,9 +258,5 @@ public class Game {
     public boolean ended() {
         // TODO add logic
         return false;
-    }
-
-    public int getCurrentPlayerIndex() {
-        return currentPlayerIndex;
     }
 }
