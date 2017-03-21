@@ -1,4 +1,4 @@
-package com.anastasia.potions.game;
+package com.anastasia.potions.game.player;
 
 public class Player {
 
@@ -6,5 +6,10 @@ public class Player {
 
     public Player(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

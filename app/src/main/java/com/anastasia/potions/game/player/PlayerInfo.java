@@ -1,4 +1,4 @@
-package com.anastasia.potions.game;
+package com.anastasia.potions.game.player;
 
 import com.anastasia.potions.card.Card;
 
@@ -7,14 +7,21 @@ import java.util.List;
 
 public class PlayerInfo {
 
-    Player player;
-    final List<Card> cards;
-    int score;
+    private final Player player;
+    private final int playerIndex;
 
-    public PlayerInfo(Player player) {
+    private final List<Card> cards;
+    private int score;
+
+    public PlayerInfo(Player player, int playerIndex) {
         this.player = player;
+        this.playerIndex = playerIndex;
         this.cards = new ArrayList<>();
         this.score = 0;
+    }
+
+    public int getPlayerIndex() {
+        return playerIndex;
     }
 
     public void increaseScore(int additionalScore) {
@@ -25,8 +32,10 @@ public class PlayerInfo {
         cards.add(card);
     }
 
-    public Card removeCard(int index) {
-        return cards.remove(index);
+    public Card getCard(int index) { return cards.get(index); }
+
+    public void removeCard(Card card) {
+        cards.remove(card);
     }
 
     public List<Card> getCards() {
@@ -39,5 +48,10 @@ public class PlayerInfo {
 
     public String getName() {
         return player.name;
+    }
+
+    @Override
+    public String toString() {
+        return player.toString();
     }
 }

@@ -2,22 +2,21 @@ package com.anastasia.potions.adapter;
 
 import android.content.Context;
 
-import com.anastasia.potions.game.CreatedObject;
-import com.anastasia.potions.game.CupboardCell;
+import com.anastasia.potions.R;
+import com.anastasia.potions.game.created.CreatedObject;
 import com.anastasia.potions.view.CreatedObjectView;
-import com.anastasia.potions.view.CupboardCellView;
 
-import java.util.List;
+public class CreatedObjectAdapter extends GameListAdapter<CreatedObject, CreatedObjectView> {
 
-public class CreatedObjectAdapter extends AbstractListAdapter<CreatedObject, CreatedObjectView> {
-
-    public CreatedObjectAdapter(Context context, List<CreatedObject> createdObjects) {
-        super(context, createdObjects);
+    public CreatedObjectAdapter(Context context) {
+        super(context);
     }
 
     @Override
     protected CreatedObjectView createView(CreatedObject createdObject) {
         CreatedObjectView createdObjectView = new CreatedObjectView(context);
+        createdObjectView.setBackgroundResource(R.drawable.background_selector_object);
+
         createdObjectView.setCreatedObject(createdObject);
 
         return createdObjectView;

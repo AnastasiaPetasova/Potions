@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="recipe_picture_size">120dp</dimen>
     <dimen name="recipe_picture_padding">2dp</dimen>
+    <dimen name="card_info_text_size">30sp</dimen>
+    <dimen name="card_info_margin">10dp</dimen>
 </resources>

@@ -31,5 +31,6 @@ public class CardPictures {
         addPicture(Recipe.TOOTH, R.drawable.tooth);
         addPicture(Recipe.ICE, R.drawable.ice);
         addPicture(Recipe.SUN, R.drawable.sun);
+        addPicture(Recipe.PRISM, R.drawable.prism);
     }
 }
