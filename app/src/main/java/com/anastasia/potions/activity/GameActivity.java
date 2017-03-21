@@ -93,39 +93,13 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
     }
 
     void startTurn() {
-        updatePlayerName();
+        updatePlayerButton();
         updatePlayerHand();
     }
 
     void nextTurn() {
-        endTurn();
         game.nextTurn();
         startTurn();
-    }
-
-    void endTurn() {
-        // здесь проверять?
-        if (game.ended()) {
-            AlertDialog endDialog = new AlertDialog.Builder(GameActivity.this)
-                    .setCancelable(false)
-                    .setTitle("Конец игры")
-                    .setMessage("Игра закончена!")
-                    .setPositiveButton("Рестартнуть игру?", new AlertDialog.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            startGame();
-                        }
-                    })
-                    .setNegativeButton("Вернуться к игровому полю", new AlertDialog.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .create();
-
-            endDialog.show();
-        }
     }
 
     void updateScores() {
@@ -138,11 +112,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
                     player.getPlayerIndex()
             ).setText(updatedScoreText);
         }
-    }
-
-    void updatePlayerName() {
-        TextView playerNameView = getConfirmTextView();
-        playerNameView.setText(game.getCurrentPlayer().getName());
     }
 
     void updatePlayerHand() {
@@ -168,11 +137,56 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
         );
     }
 
+    void updatePlayerButton() {
+        if (game.isEnded()) {
+            getConfirmButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AlertDialog.Builder(GameActivity.this)
+                            .setCancelable(false)
+                            .setTitle("Конец игры")
+                            .setMessage("Игра закончена!")
+                            .setPositiveButton("Рестартнуть игру?", new AlertDialog.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startGame();
+                                }
+                            })
+                            .setNegativeButton("Вернуться к игровому полю", new AlertDialog.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
+            });
+
+            getConfirmButton().setBackgroundResource(R.drawable.confirm);
+            getConfirmButton().setVisibility(View.VISIBLE);
+
+            getConfirmTextView().setText("Конец игры");
+        } else {
+            getConfirmButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    nextTurn();
+                }
+            });
+
+            getConfirmButton().setBackgroundResource(R.drawable.next_turn);
+            getConfirmButton().setVisibility(View.VISIBLE);
+
+            PlayerInfo currentPlayer = game.getCurrentPlayer();
+            getConfirmTextView().setText(currentPlayer.getName());
+        }
+    }
+
     void updateCreateButton() {
         if (game.canCreate()) {
             getConfirmButton().setVisibility(View.VISIBLE);
 
-            getConfirmButton().setBackgroundResource(R.drawable.create_card);
+            getConfirmButton().setBackgroundResource(R.drawable.confirm);
             getConfirmButton().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -183,7 +197,9 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
             getConfirmTextView().setText("Собрать рецепт");
         } else {
             getConfirmButton().setVisibility(View.INVISIBLE);
-            getConfirmTextView().setText("Добавьте рецепты в сборку");
+
+            PlayerInfo currentPlayer = game.getCurrentPlayer();
+            getConfirmTextView().setText(currentPlayer.getName());
         }
     }
 
@@ -259,16 +275,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
         this.creatingCardPosition = -1;
         this.isCreatedObjectTaken = null;
 
-        getConfirmButton().setVisibility(View.VISIBLE);
-        getConfirmButton().setBackgroundResource(R.drawable.next_turn);
-        getConfirmButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nextTurn();
-            }
-        });
-
-        updatePlayerName();
+        updatePlayerButton();
 
         getHandView().setOnItemClickListener(PLAYER_TURN_HAND_CARD_CLICK_LISTENER);
         getCreatedObjectsView().setOnItemClickListener(PLAYER_TURN_CREATED_OBJECT_CLICK_LISTENER);
