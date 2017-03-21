@@ -40,6 +40,11 @@ public class Cupboard {
         cupboardCell.addCard(card);
     }
 
+    public Card pollCardWith(Recipe ingredient) {
+        CupboardCell cupboardCell = getCupboardCellFor(ingredient);
+        return cupboardCell.pollCard();
+    }
+
     public int getCardsCountFor(Recipe ingredient) {
         CupboardCell cupboardCell = getCupboardCellFor(ingredient);
         return cupboardCell.getCardsCount();
