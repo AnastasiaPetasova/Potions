@@ -7,5 +7,6 @@
     <color name="colorBackground">#6B8E23</color>
     <color name="colorCard">#8B8B00</color>
     <color name="colorObject">#CD8500</color>
+    <color name="colorSelectedObject">#55AAAA</color>
     <color name="colorCardInfoBackground">#AA5555</color>
 </resources>
