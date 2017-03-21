@@ -21,10 +21,10 @@ public class CupboardCell {
     }
 
     public void addCard(Card card) {
-        cards.addLast(card);
+        cards.push(card);
     }
 
     public Card pollCard() {
-        return cards.pollLast();
+        return cards.pop();
     }
 }
