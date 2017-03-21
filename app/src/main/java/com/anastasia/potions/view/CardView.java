@@ -36,6 +36,13 @@ public class CardView extends LinearLayout {
         complexRecipeCard.setRecipe(card.complexRecipe);
     }
 
+    @Override
+    public void setBackgroundResource(int resid) {
+        getLayout().setBackgroundResource(resid);
+    }
+
+    public LinearLayout getLayout() { return (LinearLayout) findViewById(R.id.card_view_layout); }
+
     public RecipeView getIngredientView() {
         return (RecipeView)findViewById(R.id.ingredient_view);
     }

@@ -6,7 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.game.creating.CreatedObject;
+import com.anastasia.potions.game.created.CreatedObject;
 
 public class CreatedObjectView extends LinearLayout {
 
@@ -35,6 +35,13 @@ public class CreatedObjectView extends LinearLayout {
 
         getPlayerNameView().setText(createdObject.getPlayer().getName());
     }
+
+    @Override
+    public void setBackgroundResource(int resid) {
+        getLayout().setBackgroundResource(resid);
+    }
+
+    public LinearLayout getLayout() { return (LinearLayout) findViewById(R.id.created_object_view_layout); }
 
     public RecipeView getRecipeView() {
         return (RecipeView)findViewById(R.id.recipe_view);
