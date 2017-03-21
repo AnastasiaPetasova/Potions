@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             android:background="@drawable/second_score"
             android:textSize="30sp"
-            android:text="0"
             android:layout_alignParentEnd="true"
         />
 
@@ -35,7 +34,6 @@
             android:layout_height="wrap_content"
             android:background="@drawable/first_score"
             android:textSize="30sp"
-            android:text="0"
             android:layout_marginEnd="93dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
@@ -58,7 +56,7 @@
             />
 
         <LinearLayout
-            android:id="@+id/next_turn_layout"
+            android:id="@+id/confim_layout"
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -68,16 +66,15 @@
             android:background="@color/colorBackground">
 
             <Button
-                android:id="@+id/next_turn_button"
+                android:id="@+id/confirm_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/next_turn"
-                android:onClick="nextTurn"
                 android:layout_weight="1.8"
                 />
 
             <TextView
-                android:id="@+id/current_player_name_view"
+                android:id="@+id/confirm_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
