@@ -143,6 +143,10 @@ public class Game {
         fillPlayerHand(currentPlayer);
     }
 
+    public boolean isEnded() {
+        return getCurrentPlayer().getCards().isEmpty();
+    }
+
     public void playIngredient(int position) {
         PlayerInfo currentPlayer = getCurrentPlayer();
         Card card = currentPlayer.getCard(position);
@@ -253,10 +257,5 @@ public class Game {
 
     public PlayerInfo getCurrentPlayer() {
         return players.get(currentPlayerIndex);
-    }
-
-    public boolean ended() {
-        // TODO add logic
-        return false;
     }
 }
