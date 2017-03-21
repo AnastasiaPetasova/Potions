@@ -93,6 +93,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
     }
 
     void startTurn() {
+        updatePlayerName();
         updatePlayerButton();
         updatePlayerHand();
     }
@@ -137,6 +138,11 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
         );
     }
 
+    void updatePlayerName() {
+        PlayerInfo currentPlayer = game.getCurrentPlayer();
+        getConfirmTextView().setText(currentPlayer.getName());
+    }
+
     void updatePlayerButton() {
         if (game.isEnded()) {
             getConfirmButton().setOnClickListener(new View.OnClickListener() {
@@ -176,9 +182,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
 
             getConfirmButton().setBackgroundResource(R.drawable.next_turn);
             getConfirmButton().setVisibility(View.VISIBLE);
-
-            PlayerInfo currentPlayer = game.getCurrentPlayer();
-            getConfirmTextView().setText(currentPlayer.getName());
         }
     }
 
@@ -193,13 +196,8 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
                     createCard();
                 }
             });
-
-            getConfirmTextView().setText("Собрать рецепт");
         } else {
             getConfirmButton().setVisibility(View.INVISIBLE);
-
-            PlayerInfo currentPlayer = game.getCurrentPlayer();
-            getConfirmTextView().setText(currentPlayer.getName());
         }
     }
 
