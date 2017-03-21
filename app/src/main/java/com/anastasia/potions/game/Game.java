@@ -144,7 +144,7 @@ public class Game {
     }
 
     public boolean isEnded() {
-        return getCurrentPlayer().getCards().isEmpty();
+        return getCurrentPlayer().getCards().isEmpty() && deck.isEmpty();
     }
 
     public void playIngredient(int position) {
