@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:id="@+id/created_object_view_layout"
     android:weightSum="2"
     android:background="@drawable/background_selector_object"
     android:layout_margin="@dimen/recipe_picture_padding">
