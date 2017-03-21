@@ -3,11 +3,11 @@ package com.anastasia.potions.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.util.ActivityUtils;
 
 public class MenuActivity extends Activity {
 
@@ -18,7 +18,8 @@ public class MenuActivity extends Activity {
     }
 
     public void play(View v) {
-        ActivityUtils.createActivity(this, GameActivity.class);
+        Intent playIntent = new Intent(this, GameActivity.class);
+        startActivity(playIntent);
     }
 
     public void info(View v) {

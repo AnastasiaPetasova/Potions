@@ -6,8 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.game.cupboard.CupboardCell;
-import com.anastasia.potions.util.StringUtils;
+import com.anastasia.potions.game.CupboardCell;
 
 public class CupboardCellView extends LinearLayout {
 
@@ -31,7 +30,7 @@ public class CupboardCellView extends LinearLayout {
     }
 
     public void setCupboardCell(CupboardCell cell) {
-        RecipeView ingredientCard = getIngredientView();
+        CardView ingredientCard = getIngredientView();
         ingredientCard.setRecipe(cell.ingredient);
 
         setCount(cell.getCardsCount());
@@ -39,14 +38,14 @@ public class CupboardCellView extends LinearLayout {
 
     public void setCount(int count) {
         getCountView().setText(
-                StringUtils.intToString(count)
+                Integer.toString(count)
         );
 
         refreshDrawableState();
     }
 
-    public RecipeView getIngredientView() {
-        return (RecipeView)findViewById(R.id.ingredient_view);
+    public CardView getIngredientView() {
+        return (CardView)findViewById(R.id.ingredient_view);
     }
 
     public TextView getCountView() { return (TextView) findViewById(R.id.ingredient_count_view); }

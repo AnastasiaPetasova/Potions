@@ -1,4 +1,4 @@
-package com.anastasia.potions.game.cupboard;
+package com.anastasia.potions.game;
 
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
@@ -21,10 +21,10 @@ public class CupboardCell {
     }
 
     public void addCard(Card card) {
-        cards.push(card);
+        cards.add(card);
     }
 
     public Card pollCard() {
-        return cards.pop();
+        return cards.poll();
     }
 }

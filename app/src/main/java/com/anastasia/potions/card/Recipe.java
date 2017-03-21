@@ -6,9 +6,8 @@ import java.util.List;
 
 public enum Recipe implements Iterable<Recipe> {
 
-    WATER(), FIRE(), TOOTH(),
-    ICE(2, WATER, WATER), SUN(2, FIRE, FIRE),
-    PRISM(4, ICE, SUN);
+    WATER(), FIRE(),
+    ICE(2, WATER, WATER), SUN(2, FIRE, FIRE), TOOTH();
 
     public final int score;
     public final List<Recipe> mixedRecipes;
@@ -20,10 +19,6 @@ public enum Recipe implements Iterable<Recipe> {
     Recipe(int score, Recipe... recipes) {
         this.score = score;
         this.mixedRecipes = Arrays.asList(recipes);
-    }
-
-    public String getLocalName() {
-        return RecipeLocalization.getLocalName(this);
     }
 
     public boolean isIngredient() {

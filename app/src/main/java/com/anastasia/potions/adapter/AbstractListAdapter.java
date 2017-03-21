@@ -3,35 +3,21 @@ package com.anastasia.potions.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 
-import com.anastasia.potions.util.ClassUtils;
+import com.anastasia.potions.card.Card;
+import com.anastasia.potions.view.HandCardView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GameListAdapter<ValueType, ViewType extends View> extends BaseAdapter {
-
-    public static void updateValues(Adapter adapter) {
-        ClassUtils.<BaseAdapter>cast(adapter).notifyDataSetChanged();
-    }
-
-    public static <ValueType> void setValues(Adapter adapter, List<ValueType> values){
-        ClassUtils.<GameListAdapter<ValueType, ?>>cast(adapter).setValues(values);
-    }
+public abstract class AbstractListAdapter<ValueType, ViewType extends View> extends BaseAdapter {
 
     Context context;
-    private List<ValueType> values;
+    List<ValueType> values;
 
-    GameListAdapter(Context context) {
+    protected AbstractListAdapter(Context context, List<ValueType> values) {
         this.context = context;
-        this.values = new ArrayList<>();
-    }
-
-    private void setValues(List<ValueType> values) {
         this.values = values;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -55,6 +41,7 @@ public abstract class GameListAdapter<ValueType, ViewType extends View> extends 
     public ViewType getView(int position, View convertView, ViewGroup parent) {
         ValueType value = getItem(position);
 
-        return createView(value);
+        ViewType view = createView(value);
+        return view;
     }
 }

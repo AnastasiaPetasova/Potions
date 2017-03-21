@@ -1,14 +1,12 @@
 package com.anastasia.potions.card;
 
-import java.io.Serializable;
-
-public class Card implements Cloneable, Serializable {
+public class Card implements Cloneable {
 
     public Recipe ingredient;
     public Recipe complexRecipe;
 
     public static Card create(Recipe ingredient, Recipe complexRecipe) {
-        if (!ingredient.isIngredient()) throw new RuntimeException("Первый параметр карты должен быть ингредиентом");
+        if (!ingredient.isIngredient()) throw new RuntimeException("Первый параметр карты должен быть ингридиентом");
         if (complexRecipe.isIngredient()) throw new RuntimeException("Второй параметр карты должен быть сложным рецептом");
 
         return new Card(ingredient, complexRecipe);
@@ -17,11 +15,6 @@ public class Card implements Cloneable, Serializable {
     private Card(Recipe ingredient, Recipe complexRecipe) {
         this.ingredient = ingredient;
         this.complexRecipe = complexRecipe;
-    }
-
-    @Override
-    public String toString() {
-        return ingredient.name() + "-" + complexRecipe.name();
     }
 
     @Override
