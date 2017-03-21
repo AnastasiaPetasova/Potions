@@ -11,15 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
+import com.anastasia.potions.adapter.CardAdapter;
 import com.anastasia.potions.adapter.CreatedObjectAdapter;
 import com.anastasia.potions.adapter.CupboardCellAdapter;
 import com.anastasia.potions.adapter.GameListAdapter;
-import com.anastasia.potions.adapter.CardAdapter;
 import com.anastasia.potions.card.Card;
-import com.anastasia.potions.card.Recipe;
-import com.anastasia.potions.game.creating.CreatedObject;
-import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.Game;
+import com.anastasia.potions.game.created.CreatedObject;
+import com.anastasia.potions.game.creating.NotEnoughIngredientsException;
+import com.anastasia.potions.game.creating.RecipeCreatingConstants;
+import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.player.PlayerInfo;
 import com.anastasia.potions.util.StringUtils;
 
@@ -27,9 +28,12 @@ import org.lucasr.twowayview.TwoWayView;
 
 import java.util.ArrayList;
 
-public class GameActivity extends Activity implements CardInfoIntentActivity {
+public class GameActivity extends Activity implements CardInfoIntentActivity, RecipeCreatingConstants {
 
     Game game;
+
+    int creatingCardPosition;
+    boolean[] isCreatedObjectTaken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,36 +54,6 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         getHandView().setAdapter(
                 new CardAdapter(this)
         );
-
-        getHandView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final PlayerInfo currentPlayer = game.getCurrentPlayer();
-
-                new AlertDialog.Builder(GameActivity.this)
-                        .setTitle("Выберите действиe")
-                        .setMessage("Использовать ингредиент или сложный рецепт?")
-                        .setCancelable(true)
-                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                showHandCardInfo(currentPlayer, position);
-                            }
-                        })
-                        .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                playIngredient(currentPlayer, position);
-                            }
-                        })
-                        .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                playComplexRecipe(currentPlayer, position);
-                            }
-                        }).show();
-            }
-        });
     }
 
     void initCupboard() {
@@ -99,28 +73,14 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         getCreatedObjectsView().setAdapter(
                 new CreatedObjectAdapter(this)
         );
-
-        getCreatedObjectsView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                new AlertDialog.Builder(GameActivity.this)
-                        .setTitle("Выберите действиe")
-                        .setMessage("Использовать рецепт в сборке?")
-                        .setCancelable(true)
-                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                showCreatedObjectInfo(position);
-                            }
-                        }).show();
-            }
-        });
     }
 
     void startGame() {
         createGame();
-
         game.start();
+
+        setPlayerTurnMode();
+        updateScores();
 
         startTurn();
     }
@@ -128,38 +88,16 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
     void createGame() {
         this.game = Game.create();
 
-        GameListAdapter.setValues(
-                getCupboardView().getAdapter(),
-                game.getCupboardCells()
-        );
-
-        GameListAdapter.setValues(
-                getCreatedObjectsView().getAdapter(),
-                game.getCreatedObjects()
-        );
+        updateCupboard();
+        updateCreatedObjects();
     }
 
     void startTurn() {
         updatePlayerName();
-        fillPlayerHand();
+        updatePlayerHand();
     }
 
-    void updatePlayerName() {
-        TextView playerNameView = (TextView) findViewById(R.id.current_player_name_view);
-
-        playerNameView.setText(game.getCurrentPlayer().getName());
-    }
-
-    void fillPlayerHand() {
-        final PlayerInfo currentPlayerInfo = game.getCurrentPlayer();
-
-        GameListAdapter.setValues(
-                getHandView().getAdapter(),
-                currentPlayerInfo.getCards()
-        );
-    }
-
-    public void nextTurn(View v) {
+    void nextTurn() {
         endTurn();
         game.nextTurn();
         startTurn();
@@ -190,48 +128,290 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         }
     }
 
-    void updateScore(Recipe recipe) {
-        game.getCurrentPlayer().increaseScore(recipe.score);
+    void updateScores() {
+        for (PlayerInfo player : game.getPlayers()) {
+            String updatedScoreText = StringUtils.intToString(
+                    player.getScore()
+            );
 
-        int updatedScore = game.getCurrentPlayer().getScore();
-        String updatedScoreText = StringUtils.intToString(updatedScore);
-
-        getScoreButton(
-                game.getCurrentPlayerIndex()
-        ).setText(updatedScoreText);
+            getScoreButton(
+                    player.getPlayerIndex()
+            ).setText(updatedScoreText);
+        }
     }
 
-    void playIngredient(PlayerInfo currentPlayer, int position) {
-        Card card = currentPlayer.removeCard(position);
-        game.addToCupboard(card);
-
-        updateScore(card.ingredient);
-
-        GameListAdapter.updateValues(
-                getCupboardView().getAdapter()
-        );
-
-        GameListAdapter.updateValues(
-                getHandView().getAdapter()
-        );
+    void updatePlayerName() {
+        TextView playerNameView = getConfirmTextView();
+        playerNameView.setText(game.getCurrentPlayer().getName());
     }
 
-    void playComplexRecipe(PlayerInfo currentPlayer, int position) {
-        Card card = currentPlayer.removeCard(position);
-        game.addToCreatedObjects(card);
+    void updatePlayerHand() {
+        PlayerInfo currentPlayer = game.getCurrentPlayer();
 
-        updateScore(card.complexRecipe);
-
-        GameListAdapter.updateValues(
-                getCreatedObjectsView().getAdapter()
-        );
-
-        GameListAdapter.updateValues(
-                getHandView().getAdapter()
+        GameListAdapter.setValues(
+                getHandView().getAdapter(),
+                currentPlayer.getCards()
         );
     }
 
-    void showHandCardInfo(PlayerInfo currentPlayer, int position) {
+    void updateCreatedObjects() {
+        GameListAdapter.setValues(
+                getCreatedObjectsView().getAdapter(),
+                game.getCreatedObjects()
+        );
+    }
+
+    void updateCupboard() {
+        GameListAdapter.setValues(
+                getCupboardView().getAdapter(),
+                game.getCupboardCells()
+        );
+    }
+
+    void updateCreateButton() {
+        if (game.canCreate()) {
+            getConfirmButton().setVisibility(View.VISIBLE);
+
+            getConfirmButton().setBackgroundResource(R.drawable.create_card);
+            getConfirmButton().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    createCard();
+                }
+            });
+
+            getConfirmTextView().setText("Собрать рецепт");
+        } else {
+            getConfirmButton().setVisibility(View.INVISIBLE);
+            getConfirmTextView().setText("Добавьте рецепты в сборку");
+        }
+    }
+
+    void playIngredient(int position) {
+        game.playIngredient(position);
+
+        updateScores();
+
+        updatePlayerHand();
+        updateCupboard();
+    }
+
+    boolean playComplexRecipe(int position) {
+        try {
+            game.startCreatingCardAt(position);
+            setCreatingMode(position);
+
+            return true;
+        } catch (NotEnoughIngredientsException e) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Недостаточно ингредиентов")
+                    .setMessage("Не хватает ингредиентов для создания рецепта")
+                    .setCancelable(true)
+                    .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+
+            return false;
+        }
+    }
+
+    final AdapterView.OnItemClickListener PLAYER_TURN_HAND_CARD_CLICK_LISTENER = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+            new AlertDialog.Builder(GameActivity.this)
+                    .setTitle("Выберите действиe")
+                    .setMessage("Использовать ингредиент или сложный рецепт?")
+                    .setCancelable(true)
+                    .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showHandCardInfo(position);
+                        }
+                    })
+                    .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            playIngredient(position);
+                        }
+                    })
+                    .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (playComplexRecipe(position)) {
+                                view.setBackgroundResource(R.drawable.background_selector_selected_object);
+                            }
+                        }
+                    }).show();
+        }
+    };
+
+    final AdapterView.OnItemClickListener PLAYER_TURN_CREATED_OBJECT_CLICK_LISTENER = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            showCreatedObjectInfo(position);
+        }
+    };
+
+    void setPlayerTurnMode() {
+        this.creatingCardPosition = -1;
+        this.isCreatedObjectTaken = null;
+
+        getConfirmButton().setVisibility(View.VISIBLE);
+        getConfirmButton().setBackgroundResource(R.drawable.next_turn);
+        getConfirmButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nextTurn();
+            }
+        });
+
+        updatePlayerName();
+
+        getHandView().setOnItemClickListener(PLAYER_TURN_HAND_CARD_CLICK_LISTENER);
+        getCreatedObjectsView().setOnItemClickListener(PLAYER_TURN_CREATED_OBJECT_CLICK_LISTENER);
+    }
+
+    final AdapterView.OnItemClickListener CREATING_HAND_CARD_CLICK_LISTENER = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+            if (position != creatingCardPosition) {
+                showHandCardInfo(position);
+            } else {
+                new AlertDialog.Builder(GameActivity.this)
+                        .setTitle("Выберите действие")
+                        .setMessage("Отменить создание рецепта?")
+                        .setCancelable(true)
+                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                showHandCardInfo(position);
+                            }
+                        })
+                        .setPositiveButton("Отменить", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                closeCreatingMode();
+                                view.setBackgroundResource(R.drawable.background_selector_card);
+                            }
+                        }).show();
+            }
+        }
+    };
+
+    final AdapterView.OnItemClickListener CREATING_CREATED_OBJECT_CLICK_LISTENER = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this)
+                    .setTitle("Выберите действиe")
+                    .setCancelable(true)
+                    .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showCreatedObjectInfo(position);
+                        }
+                    });
+
+            if (isCreatedObjectTaken[position]) {
+                builder.setMessage("Отменить использование в сборке?")
+                        .setPositiveButton("Отменить", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (removeFromBuildOn(position)) {
+                                    view.setBackgroundResource(R.drawable.background_selector_object);
+                                    isCreatedObjectTaken[position] = false;
+                                }
+
+                                updateCreateButton();
+                            }
+                        });
+            } else {
+                builder.setMessage("Использовать рецепт в сборке?")
+                        .setPositiveButton("Использовать", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (tryTakeCreatedObjectOn(position)) {
+                                    view.setBackgroundResource(R.drawable.background_selector_selected_object);
+                                    isCreatedObjectTaken[position] = true;
+                                }
+
+                                updateCreateButton();
+                            }
+                        });
+            }
+
+            builder.show();
+        }
+    };
+
+    void setCreatingMode(int position) {
+        this.creatingCardPosition = position;
+        this.isCreatedObjectTaken = new boolean[getCreatedObjectsView().getCount()];
+
+        updateCreateButton();
+
+        getHandView().setOnItemClickListener(CREATING_HAND_CARD_CLICK_LISTENER);
+        getCreatedObjectsView().setOnItemClickListener(CREATING_CREATED_OBJECT_CLICK_LISTENER);
+    }
+
+    boolean tryTakeCreatedObjectOn(int position) {
+        int result = game.tryTakeCreatedObjectOn(position);
+
+        if (NOT_NEEDED == result) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Невозможное действие")
+                    .setMessage("Данный объект не входит в создаваемый рецепт")
+                    .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+
+            return false;
+        } else if (ALREADY_FULL == result) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Невозможное действие")
+                    .setMessage("Объектов данного типа уже достаточно для сборки рецепта")
+                    .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    boolean removeFromBuildOn(int position) {
+        game.removeFromBuildOn(position);
+        return true;
+    }
+
+    void createCard() {
+        if (game.createCard()) {
+            updateScores();
+
+            updatePlayerHand();
+            updateCupboard();
+            updateCreatedObjects();
+
+            closeCreatingMode();
+        }
+    }
+
+    void closeCreatingMode() {
+        game.closeCreatingMode();
+        setPlayerTurnMode();
+    }
+
+    void showHandCardInfo(int position) {
+        PlayerInfo currentPlayer = game.getCurrentPlayer();
         Card card = currentPlayer.getCard(position);
 
         Intent intent = new Intent(this, CardInfoActivity.class);
@@ -266,11 +446,19 @@ public class GameActivity extends Activity implements CardInfoIntentActivity {
         intent.putExtra(CARD, createdObject.getBaseCard());
 
         intent.putExtra(CARDS_LIST_NAME, "Карты в составе рецепта");
-        intent.putExtra(CARDS_LIST, createdObject.getSerializableUsedCards());
+        intent.putExtra(CARDS_LIST, createdObject.getUsedCards());
 
         intent.putExtra(CARD_IN_CARDS_LIST_POSITION, "Карта в составе рецепта");
 
         startActivity(intent);
+    }
+
+    Button getConfirmButton() {
+        return (Button) findViewById(R.id.confirm_button);
+    }
+
+    TextView getConfirmTextView() {
+        return (TextView) findViewById(R.id.confirm_text_view);
     }
 
     private static final int[] SCORE_BUTTON_IDS = {
