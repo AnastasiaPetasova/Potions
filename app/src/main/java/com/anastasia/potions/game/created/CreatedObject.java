@@ -1,10 +1,9 @@
-package com.anastasia.potions.game.creating;
+package com.anastasia.potions.game.created;
 
 import com.anastasia.potions.card.Card;
 import com.anastasia.potions.card.Recipe;
 import com.anastasia.potions.game.player.PlayerInfo;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,11 @@ public class CreatedObject {
         return baseCard.complexRecipe;
     }
 
-    public Serializable getSerializableUsedCards() {
+    /**
+     * Возвращает ArrayList вместо List, чтобы был Serializable
+     * @return список карт, использованных при сборке рецепта
+     */
+    public ArrayList<Card> getUsedCards() {
         return (ArrayList<Card>) usedCards;
     }
 }
