@@ -39,6 +39,7 @@ public class Game {
     private final List<PlayerInfo> players;
 
     private RecipeBuilder recipeBuilder;
+    private boolean currentPlayerPlayedCard;
 
     private static void addPlayer(List<PlayerInfo> players, Player player) {
         int playerIndex = players.size();
@@ -133,14 +134,20 @@ public class Game {
             fillPlayerHand(player);
         }
 
-        currentPlayerIndex = 0;
+        currentPlayerIndex = -1;
+        nextTurn();
     }
 
     public void nextTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        currentPlayerPlayedCard = false;
 
         PlayerInfo currentPlayer = getCurrentPlayer();
         fillPlayerHand(currentPlayer);
+    }
+
+    public boolean isCurrentPlayerPlayedCard() {
+        return currentPlayerPlayedCard;
     }
 
     public boolean isEnded() {
@@ -153,6 +160,8 @@ public class Game {
 
         getCurrentPlayer().removeCard(card);
         cupboard.add(card);
+
+        currentPlayerPlayedCard = true;
     }
 
     public List<CupboardCell> getCupboardCells() {
@@ -239,12 +248,14 @@ public class Game {
             cupboard.add(card);
         }
 
-        return closeCreatingMode();
+        closeCreatingMode();
+
+        currentPlayerPlayedCard = true;
+        return true;
     }
 
-    public boolean closeCreatingMode() {
+    public void closeCreatingMode() {
         this.recipeBuilder = null;
-        return true;
     }
 
     public List<CreatedObject> getCreatedObjects() {

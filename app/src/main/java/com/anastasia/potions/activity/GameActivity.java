@@ -172,7 +172,7 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
             getConfirmButton().setVisibility(View.VISIBLE);
 
             getConfirmTextView().setText("Конец игры");
-        } else {
+        } else if (game.isCurrentPlayerPlayedCard()) {
             getConfirmButton().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -182,6 +182,8 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
 
             getConfirmButton().setBackgroundResource(R.drawable.next_turn);
             getConfirmButton().setVisibility(View.VISIBLE);
+        } else {
+            getConfirmButton().setVisibility(View.INVISIBLE);
         }
     }
 
@@ -208,6 +210,8 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
 
         updatePlayerHand();
         updateCupboard();
+
+        updatePlayerButton();
     }
 
     boolean playComplexRecipe(int position) {
@@ -235,30 +239,34 @@ public class GameActivity extends Activity implements CardInfoIntentActivity, Re
     final AdapterView.OnItemClickListener PLAYER_TURN_HAND_CARD_CLICK_LISTENER = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-            new AlertDialog.Builder(GameActivity.this)
-                    .setTitle("Выберите действиe")
-                    .setMessage("Использовать ингредиент или сложный рецепт?")
-                    .setCancelable(true)
-                    .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showHandCardInfo(position);
-                        }
-                    })
-                    .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            playIngredient(position);
-                        }
-                    })
-                    .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (playComplexRecipe(position)) {
-                                view.setBackgroundResource(R.drawable.background_selector_selected_object);
+            if (game.isCurrentPlayerPlayedCard()) {
+                showHandCardInfo(position);
+            } else {
+                new AlertDialog.Builder(GameActivity.this)
+                        .setTitle("Выберите действиe")
+                        .setMessage("Использовать ингредиент или сложный рецепт?")
+                        .setCancelable(true)
+                        .setNeutralButton("Информация", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                showHandCardInfo(position);
                             }
-                        }
-                    }).show();
+                        })
+                        .setPositiveButton("Ингрeдиент", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                playIngredient(position);
+                            }
+                        })
+                        .setNegativeButton("Сложный рецепт", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (playComplexRecipe(position)) {
+                                    view.setBackgroundResource(R.drawable.background_selector_selected_object);
+                                }
+                            }
+                        }).show();
+            }
         }
     };
 
