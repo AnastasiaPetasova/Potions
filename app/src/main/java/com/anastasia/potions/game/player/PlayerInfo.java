@@ -7,14 +7,21 @@ import java.util.List;
 
 public class PlayerInfo {
 
-    private Player player;
+    private final Player player;
+    private final int playerIndex;
+
     private final List<Card> cards;
     private int score;
 
-    public PlayerInfo(Player player) {
+    public PlayerInfo(Player player, int playerIndex) {
         this.player = player;
+        this.playerIndex = playerIndex;
         this.cards = new ArrayList<>();
         this.score = 0;
+    }
+
+    public int getPlayerIndex() {
+        return playerIndex;
     }
 
     public void increaseScore(int additionalScore) {
@@ -27,8 +34,8 @@ public class PlayerInfo {
 
     public Card getCard(int index) { return cards.get(index); }
 
-    public Card removeCard(int index) {
-        return cards.remove(index);
+    public void removeCard(Card card) {
+        cards.remove(card);
     }
 
     public List<Card> getCards() {
