@@ -101,8 +101,8 @@ public class Game {
 
         differentCardsCount = Math.min(differentCardsCount, indexPairs.size());
         for (int i = 0; i < differentCardsCount; ++i) {
-            final int ingredientIndex = rnd.nextInt(ingredients.size());
-            final int complexRecipeIndex = rnd.nextInt(complexRecipes.size());
+            final int ingredientIndex = indexPairs.get(i).first;
+            final int complexRecipeIndex = indexPairs.get(i).second;
 
             Card card = Card.create(
                     ingredients.get(ingredientIndex),
