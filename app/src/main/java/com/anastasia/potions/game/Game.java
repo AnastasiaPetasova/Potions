@@ -161,6 +161,8 @@ public class Game {
         getCurrentPlayer().removeCard(card);
         cupboard.add(card);
 
+        getCurrentPlayer().increaseScore(card.ingredient.score);
+
         currentPlayerPlayedCard = true;
     }
 
