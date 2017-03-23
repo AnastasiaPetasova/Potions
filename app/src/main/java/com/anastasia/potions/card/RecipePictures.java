@@ -7,7 +7,7 @@ import com.anastasia.potions.R;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CardPictures {
+public class RecipePictures {
 
     private final static Map<Recipe, Integer> pictures;
 

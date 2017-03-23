@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.anastasia.potions.R;
-import com.anastasia.potions.card.CardPictures;
+import com.anastasia.potions.card.RecipePictures;
 import com.anastasia.potions.card.Recipe;
 
 public class RecipeView extends LinearLayout {
@@ -33,7 +33,7 @@ public class RecipeView extends LinearLayout {
     }
 
     public void setRecipe(Recipe recipe) {
-        @DrawableRes int recipePictureId = CardPictures.getPictureId(recipe);
+        @DrawableRes int recipePictureId = RecipePictures.getPictureId(recipe);
         getImageView().setImageResource(recipePictureId);
         getTextView().setText(recipe.getLocalName());
     }
