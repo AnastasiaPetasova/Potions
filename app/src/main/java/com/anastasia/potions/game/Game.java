@@ -12,6 +12,7 @@ import com.anastasia.potions.game.cupboard.Cupboard;
 import com.anastasia.potions.game.cupboard.CupboardCell;
 import com.anastasia.potions.game.player.Player;
 import com.anastasia.potions.game.player.PlayerInfo;
+import com.anastasia.potions.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class Game {
 
     private final static Random rnd = new Random();
 
-    private final static int DIFFERENT_CARDS_COUNT = 9, EACH_CARD_COUNT = 5;
-    private final static int PLAYER_HAND_SIZE = 7;
+    private final static int DIFFERENT_CARDS_COUNT = 10, EACH_CARD_COUNT = 3;
+    private final static int PLAYER_HAND_SIZE = 5;
 
     private final Deque<Card> deck;
     private final Cupboard cupboard;
@@ -87,23 +88,29 @@ public class Game {
     private static List<Card> generateCards(
             List<Recipe> ingredients, List<Recipe> complexRecipes,
             int differentCardsCount, int eachCardCount) {
-        Set<Card> generatedCards = new HashSet<>();
         List<Card> deckList = new ArrayList<>();
 
-        while (generatedCards.size() < differentCardsCount) {
-            final int ingredientIndex = rnd.nextInt(ingredients.size());
-            final int complexRecipeIndex = rnd.nextInt(complexRecipes.size());
+        List<Pair> indexPairs = new ArrayList<>();
+        for (int ingredientIndex = 0; ingredientIndex < ingredients.size(); ++ingredientIndex) {
+            for (int complexRecipeIndex = 0; complexRecipeIndex < complexRecipes.size(); ++complexRecipeIndex) {
+                indexPairs.add(new Pair(ingredientIndex, complexRecipeIndex));
+            }
+        }
+
+        Collections.shuffle(indexPairs);
+
+        differentCardsCount = Math.min(differentCardsCount, indexPairs.size());
+        for (int i = 0; i < differentCardsCount; ++i) {
+            final int ingredientIndex = indexPairs.get(i).first;
+            final int complexRecipeIndex = indexPairs.get(i).second;
 
             Card card = Card.create(
                     ingredients.get(ingredientIndex),
                     complexRecipes.get(complexRecipeIndex)
             );
 
-            // если такой еще не было, то генерим ее копии в колоду
-            if (generatedCards.add(card)) {
-                for (int duplicateIndex = 0; duplicateIndex < eachCardCount; ++duplicateIndex) {
-                    deckList.add(card.clone());
-                }
+            for (int duplicateIndex = 0; duplicateIndex < eachCardCount; ++duplicateIndex) {
+                deckList.add(card.clone());
             }
         }
 
@@ -160,6 +167,8 @@ public class Game {
 
         getCurrentPlayer().removeCard(card);
         cupboard.add(card);
+
+        getCurrentPlayer().increaseScore(card.ingredient.score);
 
         currentPlayerPlayedCard = true;
     }
